@@ -1,0 +1,12 @@
+.comics {
+  margin-bottom: 48px;
+}
+
+.comic + .comic {
+  margin-top: 16px;
+}
+
+.cover {
+  max-width: 160px;
+  max-height: 250px;
+}
