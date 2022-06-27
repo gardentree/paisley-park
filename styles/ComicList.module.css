@@ -6,11 +6,6 @@
   margin-top: 16px;
 }
 
-.cover {
-  max-width: 160px;
-  max-height: 250px;
-}
-
 .spinner {
   display: flex;
   align-items: center;

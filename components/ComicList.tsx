@@ -1,5 +1,6 @@
 import type React from "react";
 import {Container, Card, Row, Col, Spinner} from "react-bootstrap";
+import Comic from "./Comic";
 import styles from "../styles/ComicList.module.css";
 
 interface Props {
@@ -51,9 +52,7 @@ export default function ComicList(props: Props) {
                   {Array.from(magazine.values()).map((comic) => {
                     return (
                       <Col key={comic.title}>
-                        <a href={comic.anchor}>
-                          <img className={styles.cover} src={comic.image} alt={comic.title}></img>
-                        </a>
+                        <Comic attributes={comic} />
                       </Col>
                     );
                   })}
