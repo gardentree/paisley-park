@@ -48,10 +48,10 @@ export default function ComicList(props: Props) {
             <Card className={styles.magazine} key={name}>
               <Card.Header>{name}</Card.Header>
               <Card.Body>
-                <Row>
+                <Row className={styles.comics}>
                   {Array.from(magazine.values()).map((comic) => {
                     return (
-                      <Col key={comic.title}>
+                      <Col className={styles.comic} md={2} key={comic.title}>
                         <Comic attributes={comic} />
                       </Col>
                     );

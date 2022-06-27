@@ -1,9 +1,20 @@
-.comics {
+.list {
   margin-bottom: 48px;
 }
 
 .magazine + .magazine {
   margin-top: 16px;
+}
+
+.comics {
+  margin-bottom: -16px;
+}
+
+.comic {
+  text-align: center;
+}
+.comic {
+  margin-bottom: 16px;
 }
 
 .spinner {
