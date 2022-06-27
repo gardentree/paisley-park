@@ -42,10 +42,10 @@ export default function ComicList(props: Props) {
 
   return (
     <Container fluid="md">
-      <div className={styles.comics}>
+      <div className={styles.list}>
         {entries.map(([name, magazine]) => {
           return (
-            <Card className={styles.comic} key={name}>
+            <Card className={styles.magazine} key={name}>
               <Card.Header>{name}</Card.Header>
               <Card.Body>
                 <Row>
