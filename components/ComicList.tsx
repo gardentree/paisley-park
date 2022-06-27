@@ -1,5 +1,5 @@
 import type React from "react";
-import {Container, Card, Row, Col} from "react-bootstrap";
+import {Container, Card, Row, Col, Spinner} from "react-bootstrap";
 import styles from "../styles/ComicList.module.css";
 
 interface Props {
@@ -28,6 +28,15 @@ function groupByMagazine(comics: Map<string, Comic>): Map<string, Map<string, Co
 
 export default function ComicList(props: Props) {
   const {comics} = props;
+
+  if (comics.size <= 0) {
+    return (
+      <div className={styles.spinner}>
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
+  }
+
   const entries = Array.from(groupByMagazine(comics).entries());
 
   return (

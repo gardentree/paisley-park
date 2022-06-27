@@ -10,3 +10,10 @@
   max-width: 160px;
   max-height: 250px;
 }
+
+.spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
