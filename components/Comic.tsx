@@ -10,7 +10,7 @@ export default function Comic(props: Props) {
   const {attributes} = props;
 
   return (
-    <a href={attributes.anchor}>
+    <a href={attributes.anchor} target="_blank">
       <OverlayTrigger placement="bottom" overlay={<Tooltip id={`tooltip-bottom`}>{attributes.title}</Tooltip>}>
         <img className={styles.cover} src={attributes.image} alt={attributes.title}></img>
       </OverlayTrigger>
