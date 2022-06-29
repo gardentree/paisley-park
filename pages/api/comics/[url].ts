@@ -59,6 +59,10 @@ export default function handler(request: NextApiRequest, response: NextApiRespon
 
   return fetch(new URL(url, "https://www.amazon.co.jp"))
     .then(async (response) => {
+      if (!response.ok) {
+        throw new Error(JSON.stringify({status: response.status, url: response.url}));
+      }
+
       const dom = new jsdom.JSDOM(await response.text(), {contentType: "text/html"});
       dom.reconfigure({url: response.url});
       return dom.window.document;
