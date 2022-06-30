@@ -2,7 +2,7 @@ import type {NextApiRequest, NextApiResponse} from "next";
 import jsdom from "jsdom";
 
 const TITLE_PATTRN = /「(.+)」\s*全\d+[巻話]中の\d+[巻話]/;
-const HEAD_PATTRN = /.+\((.+)\)/;
+const HEAD_PATTRN = /^.+\((.+)\)$/;
 
 export function crawlComics(document: Document): Comic[] {
   const comics: Map<string, Comic> = new Map();

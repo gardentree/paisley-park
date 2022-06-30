@@ -63,6 +63,13 @@ describe(extractMagazine, () => {
     const actual = extractMagazine(section);
     expect(actual).toBe("");
   });
+  it("when magazine is not present with parentheses", () => {
+    const section = document.createElement("div");
+    section.innerHTML = "<h2>鋼の(錬金)術師 1巻</h2>";
+
+    const actual = extractMagazine(section);
+    expect(actual).toBe("");
+  });
 });
 
 describe(crawlPagination, () => {
