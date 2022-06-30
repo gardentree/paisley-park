@@ -4,7 +4,7 @@ import jsdom from "jsdom";
 const TITLE_PATTRN = /「(.+)」\s*全\d+[巻話]中の\d+[巻話]/;
 const HEAD_PATTRN = /.+\((.+)\)/;
 
-function crawlComics(document: Document): Comic[] {
+export function crawlComics(document: Document): Comic[] {
   const comics: Map<string, Comic> = new Map();
 
   document.querySelectorAll(".s-main-slot > .s-result-item").forEach((section) => {
@@ -34,14 +34,14 @@ function crawlComics(document: Document): Comic[] {
 
   return Array.from(comics.values());
 }
-function extractMagazine(section: Element): string {
+export function extractMagazine(section: Element): string {
   const head = section.querySelector("h2")!;
   const matcher = HEAD_PATTRN.exec(head.textContent!.trim());
 
   return matcher ? matcher[1] : "";
 }
 
-function crawlPagination(document: Document): Pagination {
+export function crawlPagination(document: Document): Pagination {
   const paginations = document.querySelectorAll(".s-main-slot > .s-result-item .s-pagination-container > .s-pagination-strip > *");
   const next = paginations[paginations.length - 1] as HTMLSpanElement | HTMLAnchorElement;
   const numerator = parseInt(new URL(document.location.href).searchParams.get("page") || "1");
