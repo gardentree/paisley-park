@@ -61,21 +61,21 @@ describe(extractMagazine, () => {
     section.innerHTML = "<h2>鋼の錬金術師 1巻</h2>";
 
     const actual = extractMagazine(section);
-    expect(actual).toBe("");
+    expect(actual).toBe("(その他)");
   });
   it("when magazine is not present with parentheses", () => {
     const section = document.createElement("div");
     section.innerHTML = "<h2>鋼の(錬金)術師 1巻</h2>";
 
     const actual = extractMagazine(section);
-    expect(actual).toBe("");
+    expect(actual).toBe("(その他)");
   });
   it("when magazine is not present with short text", () => {
     const section = document.createElement("div");
     section.innerHTML = "<h2>鋼の錬金術師 (1巻)</h2>";
 
     const actual = extractMagazine(section);
-    expect(actual).toBe("");
+    expect(actual).toBe("(その他)");
   });
 });
 

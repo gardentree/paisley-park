@@ -38,7 +38,7 @@ export function extractMagazine(section: Element): string {
   const head = section.querySelector("h2")!;
   const matcher = HEAD_PATTRN.exec(head.textContent!.trim());
 
-  return matcher ? matcher[1] : "";
+  return matcher ? matcher[1] : "(その他)";
 }
 
 export function crawlPagination(document: Document): Pagination {
