@@ -2595,6 +2595,11 @@ jest-each@^28.1.1:
     jest-util "^28.1.1"
     pretty-format "^28.1.1"
 
+jest-environment-jsdom-global@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/jest-environment-jsdom-global/-/jest-environment-jsdom-global-3.1.2.tgz#278f50f9fa8ea3301f9f3697b912f3571dab9dd8"
+  integrity sha512-Suq/B0c8OVUYrx05j8ynKqKMzNCTNll72SLxzoTeBtjnsbrScM2Az0dBEBPN8EVTuP1lcgWN0tV0M9+hfkvXHQ==
+
 jest-environment-jsdom@^28.1.2:
   version "28.1.2"
   resolved "https://registry.yarnpkg.com/jest-environment-jsdom/-/jest-environment-jsdom-28.1.2.tgz#d3fe82ef8f900c34ab582df7d3002c5079e3d8ab"
