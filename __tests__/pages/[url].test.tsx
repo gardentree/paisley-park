@@ -1,5 +1,79 @@
 import {render, screen} from "@testing-library/react";
-import {crawlComics, extractMagazine, crawlPagination} from "@/pages/api/comics/[url]";
+import {testApiHandler} from "next-test-api-route-handler";
+import handler, {crawlComics, extractMagazine, crawlPagination} from "@/pages/api/comics/[url]";
+
+describe(handler, () => {
+  let fetchSpy: jest.SpyInstance;
+  beforeEach(() => {
+    fetchSpy = jest.spyOn(global, "fetch");
+  });
+  it("when sucess", async () => {
+    const response = new Response(
+      `
+      <div class="s-main-slot">
+        <div class="s-result-item">
+          <div>
+            <img src="1.jpg"/>
+          </div>
+          <div>
+            <h2>鋼の錬金術師 1巻 (デジタル版ガンガンコミックス)</h2>
+            <div>
+              <a href="/1">「鋼の錬金術師」全27巻中の1巻</a>
+            </div>
+          </div>
+        </div>
+        <div class="s-result-item">
+          <div>
+            <div class="s-pagination-container">
+              <span class="s-pagination-strip">
+                <a href="?page=1" class="s-pagination-item">前へ</a>
+                <a href="?page=1" class="s-pagination-item">1</a>
+                <span class="s-pagination-item">2</span>
+                <a href="?page=3" class="s-pagination-item">3</a>
+                <span class="s-pagination-item"></span>
+                <span class="s-pagination-item">400</span>
+                <a href="?page=3" class="s-pagination-item">次へ</a>
+              </span>
+            </div>
+          </div>
+      </div>
+    `,
+      {status: 200}
+    );
+    Object.defineProperty(response, "url", {value: "http://localhost"});
+
+    fetchSpy.mockReturnValue(Promise.resolve(response as unknown as Response));
+
+    await testApiHandler({
+      handler,
+      url: "api/comics",
+      params: {url: "/?page=2"},
+      test: async ({fetch}) => {
+        const response = await fetch();
+        await expect(response.json()).resolves.toStrictEqual({
+          comics: [
+            {
+              title: "鋼の錬金術師",
+              magazine: "デジタル版ガンガンコミックス",
+              anchor: "http://localhost/1",
+              image: "http://localhost/1.jpg",
+            },
+          ],
+          pagination: {
+            next: "http://localhost/?page=3",
+            numerator: 1,
+            denominator: 400,
+          },
+        });
+      },
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith(new URL("https://www.amazon.co.jp/?page=2"));
+  });
+  afterEach(() => {
+    fetchSpy.mockClear();
+  });
+});
 
 describe(crawlComics, () => {
   it("when success", () => {
