@@ -57,7 +57,7 @@ export function crawlPagination(document: Document): Pagination {
 export default function handler(request: NextApiRequest, response: NextApiResponse) {
   const {url} = request.query as {url: string};
 
-  return fetch(new URL(url, "https://www.amazon.co.jp"))
+  return fetchWithRetry(new URL(url, "https://www.amazon.co.jp"), 3)
     .then(async (response) => {
       if (!response.ok) {
         throw new Error(JSON.stringify({status: response.status, url: response.url}));
@@ -80,4 +80,16 @@ export default function handler(request: NextApiRequest, response: NextApiRespon
         message: error.message,
       });
     });
+}
+
+export async function fetchWithRetry(url: URL | string, retry: number): Promise<Response> {
+  const response = await fetch(url);
+  if (![503].includes(response.status) || retry <= 0) {
+    return response;
+  }
+
+  console.error(`${response.status}: ${url}`);
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  return fetchWithRetry(url, --retry);
 }
