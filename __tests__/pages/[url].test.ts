@@ -1,6 +1,6 @@
 import {render, screen} from "@testing-library/react";
 import {testApiHandler} from "next-test-api-route-handler";
-import handler, {fetchWithRetry, crawlComics, extractMagazine, crawlPagination} from "@/pages/api/comics/[url]";
+import handler, {fetchWithRetry, crawlBooks, extractMagazine, crawlPagination} from "@/pages/api/books/[url]";
 
 describe(handler, () => {
   let fetchSpy: jest.SpyInstance;
@@ -46,12 +46,12 @@ describe(handler, () => {
 
     await testApiHandler({
       handler,
-      url: "api/comics",
+      url: "api/books",
       params: {url: "/?page=2"},
       test: async ({fetch}) => {
         const response = await fetch();
         await expect(response.json()).resolves.toStrictEqual({
-          comics: [
+          books: [
             {
               title: "鋼の錬金術師",
               magazine: "デジタル版ガンガンコミックス",
@@ -113,7 +113,7 @@ describe(fetchWithRetry, () => {
   });
 });
 
-describe(crawlComics, () => {
+describe(crawlBooks, () => {
   it("when success", () => {
     document.body.innerHTML = `
       <div class="s-main-slot">
@@ -142,7 +142,7 @@ describe(crawlComics, () => {
       </div>
     `;
 
-    const actual = crawlComics(document);
+    const actual = crawlBooks(document);
     expect(actual).toStrictEqual([
       {
         title: "鋼の錬金術師",

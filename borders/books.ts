@@ -1,17 +1,17 @@
-export default function read(url: string, callback: (books: Map<string, Comic>, progress: number) => void) {
+export default function read(url: string, callback: (books: Map<string, Book>, progress: number) => void) {
   const books = new Map();
 
   async function load(url: string) {
-    const response = await fetch(`api/comics/${encodeURIComponent(url)}`);
+    const response = await fetch(`api/books/${encodeURIComponent(url)}`);
 
     if (!response.ok) {
       throw new Error(JSON.stringify(await response.json()));
     }
 
     const payload: Payload = await response.json();
-    payload.comics.forEach((comic) => {
-      if (!books.has(comic.title)) {
-        books.set(comic.title, comic);
+    payload.books.forEach((book) => {
+      if (!books.has(book.title)) {
+        books.set(book.title, book);
       }
     });
 

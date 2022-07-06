@@ -1,5 +1,5 @@
 import type React from "react";
-import ComicList from "./ComicList";
+import Bookshelf from "./Bookshelf";
 import Progress from "./Progress";
 import readBooks from "@/borders/books";
 import {useState, useEffect} from "react";
@@ -10,19 +10,19 @@ interface Props {
 
 export default function BookshelfContainer(props: Props) {
   const {url} = props;
-  const [comics, setComics] = useState(new Map());
+  const [books, setBooks] = useState(new Map());
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    readBooks(url, (newComics, newProgress) => {
-      setComics(newComics);
+    readBooks(url, (newBooks, newProgress) => {
+      setBooks(newBooks);
       setProgress(newProgress);
     });
   }, [url]);
 
   return (
     <>
-      <ComicList comics={comics} />
+      <Bookshelf books={books} />
       <Progress now={progress} />
     </>
   );

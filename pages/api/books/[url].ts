@@ -4,8 +4,8 @@ import jsdom from "jsdom";
 const TITLE_PATTRN = /「(.+)」\s*全\d+[巻話]中の\d+[巻話]/;
 const HEAD_PATTRN = /^.+\((.{3,})\)$/;
 
-export function crawlComics(document: Document): Comic[] {
-  const comics: Map<string, Comic> = new Map();
+export function crawlBooks(document: Document): Book[] {
+  const books: Map<string, Book> = new Map();
 
   document.querySelectorAll(".s-main-slot > .s-result-item").forEach((section) => {
     try {
@@ -15,10 +15,10 @@ export function crawlComics(document: Document): Comic[] {
       }
 
       const title = TITLE_PATTRN.exec(anchor.textContent!.trim())![1];
-      if (!comics.has(title)) {
+      if (!books.has(title)) {
         const magazine = extractMagazine(section);
 
-        comics.set(title, {
+        books.set(title, {
           title: title,
           magazine: magazine,
           anchor: new URL(anchor.href, "https://www.amazon.co.jp").toString(),
@@ -32,7 +32,7 @@ export function crawlComics(document: Document): Comic[] {
     }
   });
 
-  return Array.from(comics.values());
+  return Array.from(books.values());
 }
 export function extractMagazine(section: Element): string {
   const head = section.querySelector("h2")!;
@@ -68,10 +68,10 @@ export default function handler(request: NextApiRequest, response: NextApiRespon
       return dom.window.document;
     })
     .then((document) => {
-      const comics = crawlComics(document);
+      const books = crawlBooks(document);
       const pagination = crawlPagination(document);
 
-      response.status(200).json({comics, pagination});
+      response.status(200).json({books, pagination});
     })
     .catch((error) => {
       console.error(error);

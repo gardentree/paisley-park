@@ -1,12 +1,12 @@
 import type React from "react";
 import {OverlayTrigger, Tooltip} from "react-bootstrap";
-import styles from "../styles/Comic.module.css";
+import styles from "../styles/Book.module.css";
 
 interface Props {
-  attributes: Comic;
+  attributes: Book;
 }
 
-export default function Comic(props: Props) {
+export default function Book(props: Props) {
   const {attributes} = props;
 
   return (

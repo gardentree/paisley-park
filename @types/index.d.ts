@@ -1,8 +1,8 @@
 interface Payload {
-  comics: Comic[];
+  books: Book[];
   pagination: Pagination;
 }
-interface Comic {
+interface Book {
   title: string;
   magazine: string;
   anchor: string;

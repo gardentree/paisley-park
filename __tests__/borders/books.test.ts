@@ -3,10 +3,10 @@ import {faker} from "@faker-js/faker";
 
 interface Plan {
   payload: Payload;
-  expected: {books: Comic[]; progress: number};
+  expected: {books: Book[]; progress: number};
 }
 
-function fakeBook(): Comic {
+function fakeBook(): Book {
   return {
     title: faker.unique(faker.music.songName),
     magazine: faker.music.genre(),
@@ -26,7 +26,7 @@ describe(read, () => {
         Promise.resolve(
           new Response(
             JSON.stringify({
-              comics: plan.payload.comics,
+              books: plan.payload.books,
               pagination: plan.payload.pagination,
             }),
             {status: 200}
@@ -42,7 +42,7 @@ describe(read, () => {
     const plans: Plan[] = [
       {
         payload: {
-          comics: [book1],
+          books: [book1],
           pagination: {
             next: "http://localhost",
             numerator: 1,
@@ -53,7 +53,7 @@ describe(read, () => {
       },
       {
         payload: {
-          comics: [book2],
+          books: [book2],
           pagination: {
             next: null,
             numerator: 2,
@@ -70,10 +70,10 @@ describe(read, () => {
       expect(callback.mock.calls.length).toBe(plans.length);
 
       for (let i = 0; plans.length > i; i++) {
-        const [comics, progress] = callback.mock.calls[i];
+        const [books, progress] = callback.mock.calls[i];
         const plan = plans[i];
 
-        expect(Array.from(comics.values())).toStrictEqual(plan.expected.books);
+        expect(Array.from(books.values())).toStrictEqual(plan.expected.books);
 
         expect(progress).toBe(plan.expected.progress);
       }
@@ -96,7 +96,7 @@ describe(read, () => {
     const plans: Plan[] = [
       {
         payload: {
-          comics: [book1],
+          books: [book1],
           pagination: {
             next: "http://localhost",
             numerator: 1,
@@ -114,9 +114,9 @@ describe(read, () => {
       read("http://localhost", callback).then(() => {
         expect(callback.mock.calls.length).toBe(plans.length);
 
-        const [comics, progress] = callback.mock.calls[0];
+        const [books, progress] = callback.mock.calls[0];
         const plan = plans[0];
-        expect(Array.from(comics.values())).toStrictEqual(plan.expected.books);
+        expect(Array.from(books.values())).toStrictEqual(plan.expected.books);
         expect(progress).toBe(plan.expected.progress);
       })
     ).rejects.toThrowError("504");
