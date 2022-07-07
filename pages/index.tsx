@@ -1,7 +1,7 @@
 import type {NextPage} from "next";
 import type React from "react";
 import {useState} from "react";
-import Entry from "../components/Entry";
+import Entry from "@/components/Entry";
 import BookshelfContainer from "@/components/BookshelfContainer";
 
 const Home: NextPage = () => {

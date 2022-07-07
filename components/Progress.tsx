@@ -1,6 +1,6 @@
 import {useState, useEffect} from "react";
 import {Container, ProgressBar} from "react-bootstrap";
-import styles from "../styles/Progress.module.css";
+import styles from "@/styles/Progress.module.css";
 
 interface Props {
   now: number;

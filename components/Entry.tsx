@@ -1,6 +1,6 @@
 import type React from "react";
 import {Form, FormControl} from "react-bootstrap";
-import styles from "../styles/Entry.module.css";
+import styles from "@/styles/Entry.module.css";
 
 interface Props {
   entry(url: string): void;

@@ -1,6 +1,6 @@
 import type React from "react";
 import {OverlayTrigger, Tooltip} from "react-bootstrap";
-import styles from "../styles/Book.module.css";
+import styles from "@/styles/Book.module.css";
 
 interface Props {
   attributes: Book;

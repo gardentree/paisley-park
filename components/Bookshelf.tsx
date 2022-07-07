@@ -1,7 +1,7 @@
 import type React from "react";
 import {Container, Card, Row, Col, Spinner} from "react-bootstrap";
 import Book from "./Book";
-import styles from "../styles/Bookshelf.module.css";
+import styles from "@/styles/Bookshelf.module.css";
 
 interface Props {
   books: Map<string, Book>;
