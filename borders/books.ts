@@ -1,3 +1,5 @@
+import {sleep} from "@/libraries/utility";
+
 export default function read(url: string, callback: (books: Map<string, Book>, progress: number) => void) {
   const books = new Map();
 
@@ -20,7 +22,7 @@ export default function read(url: string, callback: (books: Map<string, Book>, p
       const progress = Math.ceil((payload.pagination.numerator * 100) / payload.pagination.denominator);
       callback(newBooks, progress);
 
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await sleep(500);
       await load(payload.pagination.next!);
     } else {
       callback(newBooks, 100);

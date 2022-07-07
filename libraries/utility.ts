@@ -5,7 +5,11 @@ export async function fetchWithRetry(url: URL | string, retry: number): Promise<
   }
 
   console.error(`${response.status}: ${url}`);
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  await sleep(1000);
 
   return fetchWithRetry(url, --retry);
+}
+
+export function sleep(millisecond: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, millisecond));
 }
