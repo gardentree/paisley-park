@@ -20,7 +20,7 @@ export default function Progress(props: Props) {
     } else {
       document.title = "Paisley Park";
     }
-  }, [now]);
+  }, [now, message]);
 
   if (now >= 100) {
     return <></>;
