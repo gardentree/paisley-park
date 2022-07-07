@@ -19,6 +19,7 @@
       "@/components/*": ["components/*"],
       "@/pages/*": ["pages/*"],
       "@/borders/*": ["borders/*"],
+      "@/libraries/*": ["libraries/*"],
       "@/styles/*": ["styles/*"]
     }
   },

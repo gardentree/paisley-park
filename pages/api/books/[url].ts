@@ -1,5 +1,6 @@
 import type {NextApiRequest, NextApiResponse} from "next";
 import jsdom from "jsdom";
+import {fetchWithRetry} from "@/libraries/utility";
 
 const TITLE_PATTRN = /「(.+)」\s*全\d+[巻話]中の\d+[巻話]/;
 const HEAD_PATTRN = /^.+\((.{3,})\)$/;
@@ -79,16 +80,4 @@ export default async function handler(request: NextApiRequest, response: NextApi
       message,
     });
   }
-}
-
-export async function fetchWithRetry(url: URL | string, retry: number): Promise<Response> {
-  const response = await fetch(url);
-  if (![503].includes(response.status) || retry <= 0) {
-    return response;
-  }
-
-  console.error(`${response.status}: ${url}`);
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  return fetchWithRetry(url, --retry);
 }
