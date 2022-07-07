@@ -54,32 +54,31 @@ export function crawlPagination(document: Document): Pagination {
   };
 }
 
-export default function handler(request: NextApiRequest, response: NextApiResponse) {
+export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   const {url} = request.query as {url: string};
 
-  return fetchWithRetry(new URL(url, "https://www.amazon.co.jp"), 3)
-    .then(async (response) => {
-      if (!response.ok) {
-        throw new Error(JSON.stringify({status: response.status, url: response.url}));
-      }
+  try {
+    const amazon = await fetchWithRetry(new URL(url, "https://www.amazon.co.jp"), 3);
+    if (!amazon.ok) {
+      throw new Error(JSON.stringify({status: response.status, url: amazon.url}));
+    }
 
-      const dom = new jsdom.JSDOM(await response.text(), {contentType: "text/html"});
-      dom.reconfigure({url: response.url});
-      return dom.window.document;
-    })
-    .then((document) => {
-      const books = crawlBooks(document);
-      const pagination = crawlPagination(document);
+    const dom = new jsdom.JSDOM(await amazon.text(), {contentType: "text/html"});
+    dom.reconfigure({url: amazon.url});
+    const document = dom.window.document;
 
-      response.status(200).json({books, pagination});
-    })
-    .catch((error) => {
-      console.error(error);
+    const books = crawlBooks(document);
+    const pagination = crawlPagination(document);
 
-      response.status(500).json({
-        message: error.message,
-      });
+    response.status(200).json({books, pagination});
+  } catch (error) {
+    console.error(error);
+
+    const message = error instanceof Error ? error.message : error;
+    response.status(500).json({
+      message,
     });
+  }
 }
 
 export async function fetchWithRetry(url: URL | string, retry: number): Promise<Response> {
