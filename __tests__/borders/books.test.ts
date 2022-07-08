@@ -1,4 +1,4 @@
-import read from "@/borders/books";
+import buildBookReader from "@/borders/books";
 import {faker} from "@faker-js/faker";
 
 interface Plan {
@@ -14,7 +14,7 @@ function fakeBook(): Book {
     image: faker.internet.avatar(),
   };
 }
-describe(read, () => {
+describe(buildBookReader, () => {
   let fetchSpy: jest.SpyInstance;
   beforeEach(() => {
     fetchSpy = jest.spyOn(global, "fetch");
@@ -36,7 +36,7 @@ describe(read, () => {
     }
   }
 
-  it("when success", () => {
+  it("when success", async () => {
     const book1 = fakeBook();
     const book2 = fakeBook();
     const plans: Plan[] = [
@@ -44,7 +44,7 @@ describe(read, () => {
         payload: {
           books: [book1],
           pagination: {
-            next: "http://localhost",
+            next: faker.internet.url(),
             numerator: 1,
             denominator: 2,
           },
@@ -60,45 +60,32 @@ describe(read, () => {
             denominator: 2,
           },
         },
-        expected: {books: [book1, book2], progress: 100},
+        expected: {books: [book2], progress: 100},
       },
     ];
     planFetchSpy(plans);
 
-    const callback = jest.fn();
-    return read("http://localhost", callback).then(() => {
-      expect(callback.mock.calls.length).toBe(plans.length);
-
-      for (let i = 0; plans.length > i; i++) {
-        const [books, progress] = callback.mock.calls[i];
-        const plan = plans[i];
-
-        expect(Array.from(books.values())).toStrictEqual(plan.expected.books);
-
-        expect(progress).toBe(plan.expected.progress);
-      }
-    });
+    const reader = buildBookReader(faker.internet.url());
+    await expect(reader.read()).resolves.toStrictEqual(plans[0].expected);
+    await expect(reader.read()).resolves.toStrictEqual(plans[1].expected);
+    await expect(reader.read()).resolves.toBeNull();
   });
 
-  it("when raise 504 in fetch", () => {
+  it("when raise 504 in fetch", async () => {
     fetchSpy.mockReturnValueOnce(Promise.resolve(new Response("504", {status: 504})));
 
-    const callback = jest.fn();
-    return expect(
-      read("http://localhost", callback).then(() => {
-        expect(callback.mock.calls.length).toBe(0);
-      })
-    ).rejects.toThrowError("504");
+    const reader = buildBookReader(faker.internet.url());
+    await expect(reader.read()).rejects.toThrowError("504");
   });
 
-  it("when raise 504 in second fetch", () => {
+  it("when raise 504 in second fetch", async () => {
     const book1 = fakeBook();
     const plans: Plan[] = [
       {
         payload: {
           books: [book1],
           pagination: {
-            next: "http://localhost",
+            next: faker.internet.url(),
             numerator: 1,
             denominator: 2,
           },
@@ -109,17 +96,9 @@ describe(read, () => {
     planFetchSpy(plans);
     fetchSpy.mockReturnValueOnce(Promise.resolve(new Response("504", {status: 504})));
 
-    const callback = jest.fn();
-    return expect(
-      read("http://localhost", callback).then(() => {
-        expect(callback.mock.calls.length).toBe(plans.length);
-
-        const [books, progress] = callback.mock.calls[0];
-        const plan = plans[0];
-        expect(Array.from(books.values())).toStrictEqual(plan.expected.books);
-        expect(progress).toBe(plan.expected.progress);
-      })
-    ).rejects.toThrowError("504");
+    const reader = buildBookReader(faker.internet.url());
+    await expect(reader.read()).resolves.toStrictEqual(plans[0].expected);
+    await expect(reader.read()).rejects.toThrowError("504");
   });
 
   afterEach(() => {
