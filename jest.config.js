@@ -12,7 +12,6 @@ const customJestConfig = {
     "^@/pages/(.*)$": "<rootDir>/pages/$1",
     "^@/borders/(.*)$": "<rootDir>/borders/$1",
     "^@/libraries/(.*)$": "<rootDir>/libraries/$1",
-    "^@/styles/(.*)$": "<rootDir>/styles/$1",
   },
   testEnvironment: "jest-environment-jsdom-global",
 };
