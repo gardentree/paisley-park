@@ -15,3 +15,8 @@ if (typeof global.fetch === "undefined") {
   global.Headers = whatwg.Headers;
   global.Response = whatwg.Response;
 }
+
+import * as utility from "@/libraries/utility";
+jest.spyOn(utility, "sleep").mockImplementation(() => {
+  return Promise.resolve();
+});
