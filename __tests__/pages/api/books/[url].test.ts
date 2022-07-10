@@ -1,4 +1,3 @@
-import {render, screen} from "@testing-library/react";
 import {testApiHandler} from "next-test-api-route-handler";
 import handler, {crawlBooks, extractMagazine, crawlPagination} from "@/pages/api/books/[url]";
 
