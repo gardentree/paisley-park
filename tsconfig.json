@@ -19,6 +19,7 @@
       "@/components/*": ["components/*"],
       "@/pages/*": ["pages/*"],
       "@/borders/*": ["borders/*"],
+      "@/hooks/*": ["hooks/*"],
       "@/libraries/*": ["libraries/*"],
       "@/styles/*": ["styles/*"]
     }
