@@ -1,5 +1,6 @@
-import {useState, useEffect} from "react";
+import {useEffect} from "react";
 import {Container, ProgressBar} from "react-bootstrap";
+import useRemainingTime from "@/hooks/RemainingTime";
 import styles from "@/styles/Progress.module.css";
 
 interface Props {
@@ -8,11 +9,8 @@ interface Props {
 }
 
 export default function Progress(props: Props) {
-  const [startedAt, setStartedAt] = useState(Date.now());
   const {now, processing} = props;
-
-  const elapsed = Date.now() - startedAt;
-  const remaining = Math.floor(((elapsed * 100) / now - elapsed) / 1000);
+  const remaining = useRemainingTime(now);
   const message = processing ? `${now}%(残り${remaining}秒)` : `${now}%`;
 
   useEffect(() => {
