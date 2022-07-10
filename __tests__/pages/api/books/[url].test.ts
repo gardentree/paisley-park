@@ -6,6 +6,7 @@ describe(handler, () => {
   beforeEach(() => {
     fetchSpy = jest.spyOn(global, "fetch");
   });
+
   it("when sucess", async () => {
     const response = new Response(
       `
@@ -69,6 +70,26 @@ describe(handler, () => {
 
     expect(fetchSpy).toHaveBeenCalledWith(new URL("https://www.amazon.co.jp/?page=2"));
   });
+
+  it("when 503", async () => {
+    const response = new Response("503", {status: 503});
+    Object.defineProperty(response, "url", {value: "http://localhost"});
+
+    fetchSpy.mockReturnValue(Promise.resolve(response as unknown as Response));
+
+    await testApiHandler({
+      handler,
+      url: "api/books",
+      params: {url: "/?page=2"},
+      test: async ({fetch}) => {
+        const response = await fetch();
+        expect(response.status).toBe(503);
+      },
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith(new URL("https://www.amazon.co.jp/?page=2"));
+  });
+
   afterEach(() => {
     fetchSpy.mockClear();
   });

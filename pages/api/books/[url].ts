@@ -1,6 +1,5 @@
 import type {NextApiRequest, NextApiResponse} from "next";
 import jsdom from "jsdom";
-import {fetchWithRetry} from "@/libraries/utility";
 
 const TITLE_PATTRN = /「(.+)」\s*全\d+[巻話]中の\d+[巻話]/;
 const HEAD_PATTRN = /^.+\((.{3,})\)$/;
@@ -59,9 +58,11 @@ export default async function handler(request: NextApiRequest, response: NextApi
   const {url} = request.query as {url: string};
 
   try {
-    const amazon = await fetchWithRetry(new URL(url, "https://www.amazon.co.jp"), 3);
+    const amazon = await fetch(new URL(url, "https://www.amazon.co.jp"));
     if (!amazon.ok) {
-      throw new Error(JSON.stringify({status: response.status, url: amazon.url}));
+      return response.status(amazon.status).json({
+        message: amazon.url,
+      });
     }
 
     const dom = new jsdom.JSDOM(await amazon.text(), {contentType: "text/html"});

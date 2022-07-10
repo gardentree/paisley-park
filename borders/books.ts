@@ -1,3 +1,5 @@
+import {fetchWithRetry} from "@/libraries/utility";
+
 export default function buildBookReader(url: string) {
   let target: string | null = url;
 
@@ -6,7 +8,7 @@ export default function buildBookReader(url: string) {
       if (!target) {
         return null;
       }
-      const response = await fetch(`api/books/${encodeURIComponent(target)}`);
+      const response = await fetchWithRetry(`api/books/${encodeURIComponent(target)}`, 3);
 
       if (!response.ok) {
         throw new Error(JSON.stringify(await response.json()));
