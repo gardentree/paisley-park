@@ -4,7 +4,7 @@ export async function fetchWithRetry(url: URL | string, retry: number): Promise<
     return response;
   }
 
-  await sleep(1000);
+  await sleep((30 / retry) * 1000);
 
   console.info(`retry[${retry}] ${response.status}: ${url}`);
   return fetchWithRetry(url, --retry);
