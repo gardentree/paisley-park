@@ -5,7 +5,7 @@ import {useSetWithLocalStorage} from "@/hooks/LocalStorage";
 import styles from "@/styles/Bookshelf.module.css";
 
 interface Props {
-  books: Map<string, Book>;
+  books: Map<string, BookWithState>;
 }
 
 export default function Bookshelf(props: Props) {
@@ -56,8 +56,8 @@ export default function Bookshelf(props: Props) {
   );
 }
 
-function groupByMagazine(books: Map<string, Book>): Map<string, Map<string, Book>> {
-  const magazines = new Map<string, Map<string, Book>>();
+function groupByMagazine(books: Map<string, BookWithState>): Map<string, Map<string, BookWithState>> {
+  const magazines = new Map<string, Map<string, BookWithState>>();
 
   Array.from(books.values()).forEach((book) => {
     let magazine;

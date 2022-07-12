@@ -27,3 +27,25 @@ export function useSetWithLocalStorage<T>(key: string): [Set<T>, (value: T) => v
 
   return [state, toggle];
 }
+
+export function useObjectWithLocalStorage<T>(key: string, initialValue: T): [T, (update: (previous: T) => T) => void] {
+  const [state, setState] = useState<T>(() => {
+    const item = localStorage.getItem(key);
+    if (item) {
+      return JSON.parse(item);
+    } else {
+      return initialValue;
+    }
+  });
+
+  const setObject = (update: (previous: T) => T) => {
+    setState((previous) => {
+      const newObject = update(previous);
+      localStorage.setItem(key, JSON.stringify(newObject));
+
+      return newObject;
+    });
+  };
+
+  return [state, setObject];
+}
