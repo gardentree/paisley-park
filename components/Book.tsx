@@ -20,7 +20,7 @@ export default function Book(props: Props) {
           </Tooltip>
         }
       >
-        <Image className={styles.cover} src={attributes.image} alt={attributes.title} thumbnail={attributes.latest} />
+        <Image className={styles.cover} src={attributes.image} alt={attributes.title} thumbnail={attributes.latest} loading="lazy" />
       </OverlayTrigger>
     </a>
   );
