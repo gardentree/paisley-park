@@ -21,7 +21,7 @@ export default function Progress(props: Props) {
     }
   }, [now, message]);
 
-  if (now >= 100) {
+  if (now <= 0 || now >= 100) {
     return <></>;
   }
 

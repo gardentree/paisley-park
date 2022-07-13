@@ -1,9 +1,10 @@
 import type React from "react";
+import {useState, useEffect, useMemo} from "react";
+import {Button, Container, Navbar} from "react-bootstrap";
 import Bookshelf from "./Bookshelf";
 import Progress from "./Progress";
 import buildBookReader from "@/borders/books";
 import {useObjectWithLocalStorage} from "@/hooks/LocalStorage";
-import {useState, useEffect} from "react";
 import {sleep} from "@/libraries/utility";
 
 interface Props {
@@ -27,21 +28,21 @@ export default function BookshelfContainer(props: Props) {
   });
   const [books, setBooks] = useState<Map<string, BookWithState>>(new Map(campaign.books.map((book: Book) => [book.title, Object.assign({}, book, {latest: false})])));
   const [progress, setProgress] = useState(0);
-  const [processing, setProcessing] = useState(true);
+  const [processing, setProcessing] = useState(false);
 
-  useEffect(() => {
-    if (books.size > 0) {
-      return;
-    }
+  const controller = useMemo(() => {
+    let terminate = false;
 
-    let stop = false;
-    (async () => {
+    const start = async () => {
+      terminate = false;
+      setProcessing(true);
+
       let latest = new Map();
       try {
         const reader = buildBookReader(url);
         for (let i = 0; i < 1000; i++) {
           const result = await reader.read();
-          if (!result || stop) {
+          if (!result || terminate) {
             return;
           }
 
@@ -64,23 +65,51 @@ export default function BookshelfContainer(props: Props) {
         }
       } catch (error) {
         console.error(error);
-        setProcessing(false);
       } finally {
         setCampaign((previous) => ({
           ...previous,
           books: Array.from(latest.values()),
           updatedAt: Date.now(),
         }));
+        setProcessing(false);
       }
-    })();
-
-    return () => {
-      stop = true;
     };
+
+    const stop = () => {
+      terminate = true;
+    };
+
+    return {start, stop};
+  }, [url]);
+
+  useEffect(() => {
+    if (books.size <= 0) {
+      controller.start();
+    }
+
+    return controller.stop;
   }, [url]);
 
   return (
     <>
+      <Navbar expand="md" sticky="top" variant="dark" bg="dark">
+        <Container>
+          <Navbar.Brand href="/">PaisleyPark</Navbar.Brand>
+          <Navbar.Collapse className="justify-content-end">
+            <Navbar.Text>Updated: {new Date(campaign.updatedAt).toLocaleString("ja-JP")}</Navbar.Text>
+            {processing ? (
+              <Button onClick={() => controller.stop()} variant="outline-secondary">
+                Stop
+              </Button>
+            ) : (
+              <Button onClick={() => controller.start()} variant="outline-success">
+                Update
+              </Button>
+            )}
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+
       <Bookshelf books={books} />
       <Progress now={progress} processing={processing} />
     </>

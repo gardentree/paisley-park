@@ -10,3 +10,7 @@ body {
 body > div {
   height: 100%;
 }
+
+.navbar-text + button {
+  margin-left: 16px;
+}
