@@ -3,7 +3,7 @@ import {useState, useEffect, useMemo} from "react";
 import {Button, Container, Navbar} from "react-bootstrap";
 import Bookshelf from "./Bookshelf";
 import Progress from "./Progress";
-import buildBookReader from "@/borders/books";
+import buildBookReader, {FetchError} from "@/borders/books";
 import {useObjectWithLocalStorage} from "@/hooks/LocalStorage";
 import {sleep} from "@/libraries/utility";
 
@@ -20,6 +20,7 @@ interface Campaign {
 
 export default function BookshelfContainer(props: Props) {
   const {url} = props;
+  const [source, setSource] = useState(url);
   const [campaign, setCampaign] = useObjectWithLocalStorage<Campaign>(url, {
     title: url,
     url,
@@ -39,7 +40,7 @@ export default function BookshelfContainer(props: Props) {
 
       let latest = new Map();
       try {
-        const reader = buildBookReader(url);
+        const reader = buildBookReader(source);
         for await (const result of reader) {
           if (terminate) {
             return;
@@ -62,8 +63,18 @@ export default function BookshelfContainer(props: Props) {
 
           await sleep(1000);
         }
-      } catch (error) {
-        console.error(error);
+        setSource(url);
+      } catch (error: any) {
+        switch (error.constructor) {
+          case FetchError:
+            setSource(error.url);
+            break;
+          case Error:
+            console.error(error.message);
+            break;
+          default:
+            console.error(error);
+        }
       } finally {
         setCampaign((previous) => ({
           ...previous,
@@ -79,7 +90,7 @@ export default function BookshelfContainer(props: Props) {
     };
 
     return {start, stop};
-  }, [url]);
+  }, [source]);
 
   useEffect(() => {
     if (books.size <= 0) {
@@ -87,7 +98,7 @@ export default function BookshelfContainer(props: Props) {
     }
 
     return controller.stop;
-  }, [url]);
+  }, [source]);
 
   return (
     <>
@@ -102,7 +113,7 @@ export default function BookshelfContainer(props: Props) {
               </Button>
             ) : (
               <Button onClick={() => controller.start()} variant="outline-success">
-                Update
+                {url == source ? "Update" : "Resume"}
               </Button>
             )}
           </Navbar.Collapse>

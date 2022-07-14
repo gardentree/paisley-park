@@ -7,7 +7,7 @@ export default async function* buildBookReader(url: string) {
     const response = await fetchWithRetry(`api/books/${encodeURIComponent(target)}`, 3);
 
     if (!response.ok) {
-      throw new Error(JSON.stringify(await response.json()));
+      throw new FetchError(url, response.status);
     }
 
     const payload: Payload = await response.json();
@@ -17,5 +17,17 @@ export default async function* buildBookReader(url: string) {
       books: payload.books,
       progress: Math.ceil((payload.pagination.numerator * 100) / payload.pagination.denominator),
     };
+  }
+}
+
+export class FetchError extends Error {
+  url: string;
+  status: number;
+
+  constructor(url: string, status: number) {
+    super(JSON.stringify({url, status}));
+
+    this.url = url;
+    this.status = status;
   }
 }
