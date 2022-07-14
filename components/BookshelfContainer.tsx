@@ -122,6 +122,7 @@ export default function BookshelfContainer(props: Props) {
       <Navbar expand="md" sticky="top" variant="dark" bg="dark">
         <Container>
           <Navbar.Brand href="/">PaisleyPark</Navbar.Brand>
+          <Navbar.Text>{campaign.title}</Navbar.Text>
           <Navbar.Collapse className="justify-content-end">
             <Navbar.Text>Updated: {new Date(campaign.updatedAt).toLocaleString("ja-JP")}</Navbar.Text>
             <NavDropdown title={MODE[mode]}>{modeItems}</NavDropdown>
