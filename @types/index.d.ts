@@ -16,3 +16,4 @@ interface Pagination {
   numerator: number;
   denominator: number;
 }
+type DisplayMode = "all" | "newArrival";

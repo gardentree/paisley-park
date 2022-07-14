@@ -5,14 +5,15 @@ import {useSetWithLocalStorage} from "@/hooks/LocalStorage";
 import styles from "@/styles/Bookshelf.module.css";
 
 interface Props {
-  books: Map<string, BookWithState>;
+  books: BookWithState[];
+  mode: DisplayMode;
 }
 
 export default function Bookshelf(props: Props) {
-  const {books: books} = props;
+  const {books, mode} = props;
   const [exclusions, toggleExclustion] = useSetWithLocalStorage<string>("exclusions");
 
-  if (books.size <= 0) {
+  if (books.length <= 0) {
     return (
       <div className={styles.spinner}>
         <Spinner animation="border" variant="primary" />
@@ -20,7 +21,16 @@ export default function Bookshelf(props: Props) {
     );
   }
 
-  const entries = Array.from(groupByMagazine(books).entries());
+  let filteredBooks;
+  switch (mode) {
+    case "all":
+      filteredBooks = books;
+      break;
+    case "newArrival":
+      filteredBooks = books.filter((book) => book.latest);
+      break;
+  }
+  const entries = Array.from(groupByMagazine(filteredBooks).entries());
 
   const action = (event: React.MouseEvent) => {
     const magazine = event.currentTarget.closest(".accordion-header")!.textContent!;
@@ -56,10 +66,10 @@ export default function Bookshelf(props: Props) {
   );
 }
 
-function groupByMagazine(books: Map<string, BookWithState>): Map<string, Map<string, BookWithState>> {
+function groupByMagazine(books: BookWithState[]): Map<string, Map<string, BookWithState>> {
   const magazines = new Map<string, Map<string, BookWithState>>();
 
-  Array.from(books.values()).forEach((book) => {
+  Array.from(books).forEach((book) => {
     let magazine;
     if (magazines.has(book.magazine)) {
       magazine = magazines.get(book.magazine);

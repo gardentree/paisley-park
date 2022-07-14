@@ -1,6 +1,6 @@
 import type React from "react";
 import {useState, useEffect, useMemo} from "react";
-import {Button, Container, Navbar} from "react-bootstrap";
+import {Button, Container, Navbar, NavDropdown} from "react-bootstrap";
 import Bookshelf from "./Bookshelf";
 import Progress from "./Progress";
 import buildBookReader, {FetchError} from "@/borders/books";
@@ -18,6 +18,11 @@ interface Campaign {
   updatedAt: number;
 }
 
+const MODE: {[key in DisplayMode]: string} = {
+  all: "全て",
+  newArrival: "新着のみ",
+};
+
 export default function BookshelfContainer(props: Props) {
   const {url} = props;
   const [source, setSource] = useState(url);
@@ -30,6 +35,7 @@ export default function BookshelfContainer(props: Props) {
   const [books, setBooks] = useState<Map<string, BookWithState>>(new Map(campaign.books.map((book: Book) => [book.title, Object.assign({}, book, {latest: false})])));
   const [progress, setProgress] = useState(0);
   const [processing, setProcessing] = useState(false);
+  const [mode, setMode] = useState<DisplayMode>("all");
 
   const controller = useMemo(() => {
     let terminate = false;
@@ -100,6 +106,17 @@ export default function BookshelfContainer(props: Props) {
     return controller.stop;
   }, [source]);
 
+  const changeMode = (mode: DisplayMode) => {
+    setMode(mode);
+  };
+  const modeItems = Object.entries(MODE).map(([key, title]) => {
+    return (
+      <NavDropdown.Item onClick={() => changeMode(key as DisplayMode)} key={key}>
+        {title}
+      </NavDropdown.Item>
+    );
+  });
+
   return (
     <>
       <Navbar expand="md" sticky="top" variant="dark" bg="dark">
@@ -107,6 +124,7 @@ export default function BookshelfContainer(props: Props) {
           <Navbar.Brand href="/">PaisleyPark</Navbar.Brand>
           <Navbar.Collapse className="justify-content-end">
             <Navbar.Text>Updated: {new Date(campaign.updatedAt).toLocaleString("ja-JP")}</Navbar.Text>
+            <NavDropdown title={MODE[mode]}>{modeItems}</NavDropdown>
             {processing ? (
               <Button onClick={() => controller.stop()} variant="outline-secondary">
                 Stop
@@ -120,7 +138,7 @@ export default function BookshelfContainer(props: Props) {
         </Container>
       </Navbar>
 
-      <Bookshelf books={books} />
+      <Bookshelf books={Array.from(books.values())} mode={mode} />
       <Progress now={progress} processing={processing} />
     </>
   );
