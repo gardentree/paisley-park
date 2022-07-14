@@ -40,9 +40,8 @@ export default function BookshelfContainer(props: Props) {
       let latest = new Map();
       try {
         const reader = buildBookReader(url);
-        for (let i = 0; i < 1000; i++) {
-          const result = await reader.read();
-          if (!result || terminate) {
+        for await (const result of reader) {
+          if (terminate) {
             return;
           }
 

@@ -18,20 +18,17 @@ function fakeBook(): Book {
 describe(BookshelfContainer, () => {
   it("when single book", async () => {
     const book1 = fakeBook();
-    const mockRead = jest
-      .fn()
-      .mockReturnValueOnce(Promise.resolve({books: [book1], progress: 100}))
-      .mockReturnValueOnce(Promise.resolve(null));
+    async function* mock() {
+      yield {books: [book1], progress: 100};
+    }
 
-    (buildBookReader as jest.Mock).mockReturnValue({
-      read: mockRead,
-    });
+    (buildBookReader as jest.Mock).mockImplementation(mock);
 
     act(() => {
       render(<BookshelfContainer url={faker.internet.url()} />);
     });
 
-    await waitFor(() => expect(mockRead.mock.calls.length).toBe(2));
+    await waitFor(() => expect(screen.getByAltText(book1.title)).toBeInTheDocument());
 
     expect(screen.getByAltText(book1.title)).toBeInTheDocument();
     expect(screen.getByText(book1.magazine)).toBeInTheDocument();
@@ -39,21 +36,17 @@ describe(BookshelfContainer, () => {
   it("when multi book", async () => {
     const book1 = fakeBook();
     const book2 = fakeBook();
-    const mockRead = jest
-      .fn()
-      .mockReturnValueOnce(Promise.resolve({books: [book1], progress: 50}))
-      .mockReturnValueOnce(Promise.resolve({books: [book1, book2], progress: 100}))
-      .mockReturnValueOnce(Promise.resolve(null));
-
-    (buildBookReader as jest.Mock).mockReturnValue({
-      read: mockRead,
-    });
+    async function* mock() {
+      yield {books: [book1], progress: 50};
+      yield {books: [book1, book2], progress: 100};
+    }
+    (buildBookReader as jest.Mock).mockImplementation(mock);
 
     act(() => {
       render(<BookshelfContainer url={faker.internet.url()} />);
     });
 
-    await waitFor(() => expect(mockRead.mock.calls.length).toBe(3));
+    await waitFor(() => expect(screen.getByAltText(book2.title)).toBeInTheDocument());
 
     expect(screen.getByAltText(book1.title)).toBeInTheDocument();
     expect(screen.getByText(book1.magazine)).toBeInTheDocument();
@@ -63,20 +56,17 @@ describe(BookshelfContainer, () => {
   });
   it("when raise server error", async () => {
     const book1 = fakeBook();
-    const mockRead = jest
-      .fn()
-      .mockReturnValueOnce(Promise.resolve({books: [book1], progress: 50}))
-      .mockReturnValueOnce(Promise.reject("server error"));
-
-    (buildBookReader as jest.Mock).mockReturnValue({
-      read: mockRead,
-    });
+    async function* mock() {
+      yield {books: [book1], progress: 50};
+      throw new Error("Server Error");
+    }
+    (buildBookReader as jest.Mock).mockImplementation(mock);
 
     act(() => {
       render(<BookshelfContainer url={faker.internet.url()} />);
     });
 
-    await waitFor(() => expect(mockRead.mock.calls.length).toBe(2));
+    await waitFor(() => expect(screen.getByAltText(book1.title)).toBeInTheDocument());
 
     expect(screen.getByAltText(book1.title)).toBeInTheDocument();
     expect(screen.getByText(book1.magazine)).toBeInTheDocument();
