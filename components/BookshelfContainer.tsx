@@ -1,6 +1,6 @@
 import type React from "react";
 import {useState, useEffect, useMemo} from "react";
-import {Button, Container, Navbar, NavDropdown} from "react-bootstrap";
+import {Button, Container, Form, Nav, Navbar, NavDropdown} from "react-bootstrap";
 import Bookshelf from "./Bookshelf";
 import Progress from "./Progress";
 import buildBookReader, {FetchError} from "@/borders/books";
@@ -117,13 +117,25 @@ export default function BookshelfContainer(props: Props) {
     );
   });
 
+  const titleHandler: React.FormEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+
+    const title = event.currentTarget.elements["title" as any] as HTMLInputElement;
+
+    setCampaign((previous) => ({...previous, title: title.value}));
+
+    title.blur();
+  };
+
   return (
     <>
       <Navbar expand="md" fixed="top" variant="dark" bg="dark">
         <Container>
           <Navbar.Brand href="/">PaisleyPark</Navbar.Brand>
-          <Navbar.Text>{campaign.title}</Navbar.Text>
-          <Navbar.Collapse className="justify-content-end">
+          <Form onSubmit={titleHandler} className="flex-fill">
+            <Form.Control name="title" defaultValue={campaign.title} plaintext />
+          </Form>
+          <Nav className="justify-content-end">
             <Navbar.Text>Updated: {new Date(campaign.updatedAt).toLocaleString("ja-JP")}</Navbar.Text>
             <NavDropdown title={MODE[mode]}>{modeItems}</NavDropdown>
             {processing ? (
@@ -135,7 +147,7 @@ export default function BookshelfContainer(props: Props) {
                 {url == source ? "Update" : "Resume"}
               </Button>
             )}
-          </Navbar.Collapse>
+          </Nav>
         </Container>
       </Navbar>
 
