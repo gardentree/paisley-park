@@ -17,3 +17,10 @@ interface Pagination {
   denominator: number;
 }
 type DisplayMode = "all" | "newArrival";
+
+interface Campaign {
+  title: string;
+  url: string;
+  books: BookWithState[];
+  updatedAt: number;
+}

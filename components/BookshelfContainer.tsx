@@ -11,13 +11,6 @@ interface Props {
   url: string;
 }
 
-interface Campaign {
-  title: string;
-  url: string;
-  books: BookWithState[];
-  updatedAt: number;
-}
-
 const MODE: {[key in DisplayMode]: string} = {
   all: "全て",
   newArrival: "新着のみ",
