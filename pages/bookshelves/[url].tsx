@@ -9,6 +9,10 @@ const Bookshelves: NextPage = () => {
   const router = useRouter();
   const {url} = router.query;
 
+  if (!router.isReady) {
+    return null;
+  }
+
   return <BookshelfContainer url={url as string} />;
 };
 
