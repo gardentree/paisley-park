@@ -69,10 +69,20 @@ export default async function handler(request: NextApiRequest, response: NextApi
     dom.reconfigure({url: amazon.url});
     const document = dom.window.document;
 
-    const books = crawlBooks(document);
-    const pagination = crawlPagination(document);
+    try {
+      const books = crawlBooks(document);
+      const pagination = crawlPagination(document);
 
-    response.status(200).json({books, pagination});
+      response.status(200).json({books, pagination});
+    } catch (error) {
+      console.info(amazon.url);
+      console.info(error);
+      console.info(document.body.textContent);
+
+      return response.status(503).json({
+        message: amazon.url,
+      });
+    }
   } catch (error) {
     console.error(error);
 

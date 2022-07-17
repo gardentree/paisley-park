@@ -90,6 +90,25 @@ describe(handler, () => {
     expect(fetchSpy).toHaveBeenCalledWith(new URL("https://www.amazon.co.jp/?page=2"));
   });
 
+  it("when contents is empty", async () => {
+    const response = new Response(`<body><div>empty</div></body>`, {status: 200});
+    Object.defineProperty(response, "url", {value: "http://localhost"});
+
+    fetchSpy.mockReturnValue(Promise.resolve(response as unknown as Response));
+
+    await testApiHandler({
+      handler,
+      url: "api/books",
+      params: {url: "/?page=2"},
+      test: async ({fetch}) => {
+        const response = await fetch();
+        expect(response.status).toBe(503);
+      },
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith(new URL("https://www.amazon.co.jp/?page=2"));
+  });
+
   afterEach(() => {
     fetchSpy.mockClear();
   });
