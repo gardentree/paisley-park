@@ -15,12 +15,12 @@ export default function Book(props: Props) {
         placement="bottom"
         overlay={
           <Tooltip id={`tooltip-bottom`}>
-            {attributes.latest}
+            {attributes.newArrival}
             {attributes.title}
           </Tooltip>
         }
       >
-        <Image className={styles.cover} src={attributes.image} alt={attributes.title} thumbnail={attributes.latest} loading="lazy" />
+        <Image className={styles.cover} src={attributes.image} alt={attributes.title} thumbnail={attributes.newArrival} loading="lazy" />
       </OverlayTrigger>
     </a>
   );

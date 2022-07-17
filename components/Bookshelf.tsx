@@ -27,7 +27,7 @@ export default function Bookshelf(props: Props) {
       filteredBooks = books;
       break;
     case "newArrival":
-      filteredBooks = books.filter((book) => book.latest);
+      filteredBooks = books.filter((book) => book.newArrival);
       break;
   }
   const entries = Array.from(groupByMagazine(filteredBooks).entries());

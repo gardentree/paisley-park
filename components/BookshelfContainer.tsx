@@ -25,7 +25,7 @@ export default function BookshelfContainer(props: Props) {
     books: [],
     updatedAt: Date.now(),
   });
-  const [books, setBooks] = useState<Map<string, BookWithState>>(new Map(campaign.books.map((book: Book) => [book.title, Object.assign({}, book, {latest: false})])));
+  const [books, setBooks] = useState<Map<string, BookWithState>>(new Map(campaign.books.map((book: Book) => [book.title, Object.assign({}, book, {newArrival: false})])));
   const [progress, setProgress] = useState(0);
   const [processing, setProcessing] = useState(false);
   const [mode, setMode] = useState<DisplayMode>("all");
@@ -50,7 +50,7 @@ export default function BookshelfContainer(props: Props) {
 
             result.books.forEach((book) => {
               if (!newBooks.has(book.title)) {
-                newBooks.set(book.title, Object.assign({}, book, {latest: true}));
+                newBooks.set(book.title, Object.assign({}, book, {newArrival: true}));
               }
             });
 

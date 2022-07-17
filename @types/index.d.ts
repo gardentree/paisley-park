@@ -9,7 +9,7 @@ interface Book {
   image: string;
 }
 interface BookWithState extends Book {
-  latest: boolean;
+  newArrival: boolean;
 }
 interface Pagination {
   next: string | null;
