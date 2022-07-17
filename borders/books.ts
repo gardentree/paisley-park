@@ -7,7 +7,7 @@ export default async function* buildBookReader(url: string) {
     const response = await fetchWithRetry(`/api/books/${encodeURIComponent(target)}`, 3);
 
     if (!response.ok) {
-      throw new FetchError(url, response.status);
+      throw new FetchError(target, response.status);
     }
 
     const payload: Payload = await response.json();

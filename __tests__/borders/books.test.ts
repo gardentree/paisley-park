@@ -1,4 +1,4 @@
-import buildBookReader from "@/borders/books";
+import buildBookReader, {FetchError} from "@/borders/books";
 import {faker} from "@faker-js/faker";
 
 interface Plan {
@@ -74,18 +74,22 @@ describe(buildBookReader, () => {
   it("when raise 504 in fetch", async () => {
     fetchSpy.mockReturnValueOnce(Promise.resolve(new Response("504", {status: 504})));
 
-    const reader = buildBookReader(faker.internet.url());
-    await expect(reader.next()).rejects.toThrowError("504");
+    const url = faker.internet.url();
+    const reader = buildBookReader(url);
+    await expect(reader.next()).rejects.toThrowError(new FetchError(url, 504));
   });
 
   it("when raise 504 in second fetch", async () => {
     const book1 = fakeBook();
+    const first = faker.internet.url();
+    const second = faker.internet.url();
+
     const plans: Plan[] = [
       {
         payload: {
           books: [book1],
           pagination: {
-            next: faker.internet.url(),
+            next: second,
             numerator: 1,
             denominator: 2,
           },
@@ -96,9 +100,9 @@ describe(buildBookReader, () => {
     planFetchSpy(plans);
     fetchSpy.mockReturnValueOnce(Promise.resolve(new Response("504", {status: 504})));
 
-    const reader = buildBookReader(faker.internet.url());
+    const reader = buildBookReader(first);
     await expect(reader.next()).resolves.toStrictEqual({value: plans[0].expected, done: false});
-    await expect(reader.next()).rejects.toThrowError("504");
+    await expect(reader.next()).rejects.toThrowError(new FetchError(second, 504));
   });
 
   afterEach(() => {
