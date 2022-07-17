@@ -1,4 +1,4 @@
-import buildBooknexter from "@/borders/books";
+import buildBookReader from "@/borders/books";
 import {faker} from "@faker-js/faker";
 
 interface Plan {
@@ -14,7 +14,7 @@ function fakeBook(): Book {
     image: faker.internet.avatar(),
   };
 }
-describe(buildBooknexter, () => {
+describe(buildBookReader, () => {
   let fetchSpy: jest.SpyInstance;
   beforeEach(() => {
     fetchSpy = jest.spyOn(global, "fetch");
@@ -65,17 +65,17 @@ describe(buildBooknexter, () => {
     ];
     planFetchSpy(plans);
 
-    const nexter = buildBooknexter(faker.internet.url());
-    await expect(nexter.next()).resolves.toStrictEqual({value: plans[0].expected, done: false});
-    await expect(nexter.next()).resolves.toStrictEqual({value: plans[1].expected, done: false});
-    await expect(nexter.next()).resolves.toStrictEqual({value: undefined, done: true});
+    const reader = buildBookReader(faker.internet.url());
+    await expect(reader.next()).resolves.toStrictEqual({value: plans[0].expected, done: false});
+    await expect(reader.next()).resolves.toStrictEqual({value: plans[1].expected, done: false});
+    await expect(reader.next()).resolves.toStrictEqual({value: undefined, done: true});
   });
 
   it("when raise 504 in fetch", async () => {
     fetchSpy.mockReturnValueOnce(Promise.resolve(new Response("504", {status: 504})));
 
-    const nexter = buildBooknexter(faker.internet.url());
-    await expect(nexter.next()).rejects.toThrowError("504");
+    const reader = buildBookReader(faker.internet.url());
+    await expect(reader.next()).rejects.toThrowError("504");
   });
 
   it("when raise 504 in second fetch", async () => {
@@ -96,9 +96,9 @@ describe(buildBooknexter, () => {
     planFetchSpy(plans);
     fetchSpy.mockReturnValueOnce(Promise.resolve(new Response("504", {status: 504})));
 
-    const nexter = buildBooknexter(faker.internet.url());
-    await expect(nexter.next()).resolves.toStrictEqual({value: plans[0].expected, done: false});
-    await expect(nexter.next()).rejects.toThrowError("504");
+    const reader = buildBookReader(faker.internet.url());
+    await expect(reader.next()).resolves.toStrictEqual({value: plans[0].expected, done: false});
+    await expect(reader.next()).rejects.toThrowError("504");
   });
 
   afterEach(() => {
