@@ -13,15 +13,17 @@ export default function Progress(props: Props) {
   const remaining = useRemainingTime(now);
   const message = processing ? `${now}%(残り${remaining}秒)` : `${now}%`;
 
+  const show = 0 < now && now < 100;
+
   useEffect(() => {
-    if (now < 100) {
+    if (show) {
       document.title = `${message} Paisley Park`;
     } else {
       document.title = "Paisley Park";
     }
   }, [now, message]);
 
-  if (now <= 0 || now >= 100) {
+  if (!show) {
     return <></>;
   }
 
