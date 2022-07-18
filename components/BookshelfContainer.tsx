@@ -1,5 +1,5 @@
 import type React from "react";
-import {useState, useEffect, useMemo} from "react";
+import {useState, useEffect, useMemo, useCallback, useRef} from "react";
 import {Button, Container, Form, Nav, Navbar, NavDropdown} from "react-bootstrap";
 import Bookshelf from "./Bookshelf";
 import Progress from "./Progress";
@@ -18,86 +18,50 @@ const MODE: {[key in DisplayMode]: string} = {
 
 export default function BookshelfContainer(props: Props) {
   const {url} = props;
-  const [source, setSource] = useState(url);
   const [campaign, setCampaign] = useObjectWithLocalStorage<Campaign>(url, {
     title: url,
     url,
     books: [],
     updatedAt: Date.now(),
   });
-  const [books, setBooks] = useState<Map<string, BookWithState>>(new Map(campaign.books.map((book: Book) => [book.title, Object.assign({}, book, {newArrival: false})])));
+  const setCampaignRef = useRef(setCampaign);
+  const [books, setBooks] = useState(new Map());
   const [progress, setProgress] = useState(0);
   const [processing, setProcessing] = useState(false);
   const [mode, setMode] = useState<DisplayMode>("all");
 
-  const controller = useMemo(() => {
-    let terminate = false;
-
-    const start = async () => {
-      terminate = false;
-      setProcessing(true);
-
-      let latest = new Map();
-      try {
-        const reader = buildBookReader(source);
-        for await (const result of reader) {
-          if (terminate) {
-            return;
-          }
-
-          setBooks((previous) => {
-            const newBooks = new Map(previous);
-
-            result.books.forEach((book) => {
-              if (!newBooks.has(book.title)) {
-                newBooks.set(book.title, Object.assign({}, book, {newArrival: true}));
-              }
-            });
-
-            latest = newBooks;
-
-            return newBooks;
-          });
-          setProgress(result.progress);
-
-          await sleep(1000);
-        }
-        setSource(url);
-      } catch (error: any) {
-        switch (error.constructor) {
-          case FetchError:
-            setSource(error.url);
-            break;
-          case Error:
-            console.error(error.message);
-            break;
-          default:
-            console.error(error);
-        }
-      } finally {
-        setCampaign((previous) => ({
-          ...previous,
-          books: Array.from(latest.values()),
-          updatedAt: Date.now(),
-        }));
-        setProcessing(false);
-      }
-    };
-
-    const stop = () => {
-      terminate = true;
-    };
-
-    return {start, stop};
-  }, [source]);
+  const builder = useMemo(() => createControllerBuilder(url), [url]);
+  const controller = useMemo(
+    () =>
+      builder({
+        onInitialize: (books) => {
+          setBooks(books);
+        },
+        onStart: (books) => {
+          setProcessing(true);
+          setBooks(books);
+        },
+        onUpdate: (books, progress) => {
+          setBooks(books);
+          setProgress(progress);
+        },
+        onFinish: (books) => {
+          setCampaignRef.current((previous) => ({
+            ...previous,
+            books: Array.from(books.values()),
+            updatedAt: Date.now(),
+          }));
+          setProcessing(false);
+        },
+      }),
+    [builder]
+  );
 
   useEffect(() => {
-    if (books.size <= 0) {
-      controller.start();
-    }
+    controller.startIfEmpty();
 
     return controller.stop;
-  }, [source]);
+  }, [controller]);
 
   const changeMode = (mode: DisplayMode) => {
     setMode(mode);
@@ -115,7 +79,7 @@ export default function BookshelfContainer(props: Props) {
 
     const title = event.currentTarget.elements["title" as any] as HTMLInputElement;
 
-    setCampaign((previous) => ({...previous, title: title.value}));
+    setCampaignRef.current((previous) => ({...previous, title: title.value}));
 
     title.blur();
   };
@@ -137,7 +101,7 @@ export default function BookshelfContainer(props: Props) {
               </Button>
             ) : (
               <Button onClick={() => controller.start()} variant="outline-success">
-                {url == source ? "Update" : "Resume"}
+                {controller.paused() ? "Resume" : "Update"}
               </Button>
             )}
           </Nav>
@@ -148,4 +112,93 @@ export default function BookshelfContainer(props: Props) {
       <Progress now={progress} processing={processing} />
     </>
   );
+}
+
+type BookCollection = Map<string, BookWithState>;
+
+interface ControllerEvents {
+  onInitialize(books: BookCollection): void;
+  onStart(books: BookCollection): void;
+  onUpdate(books: BookCollection, progress: number): void;
+  onFinish(books: BookCollection): void;
+}
+
+function createControllerBuilder(url: string) {
+  const campaign = loadCampaign(url);
+  const books = new Map<string, BookWithState>(campaign.books.map((book: Book) => [book.title, Object.assign({}, book, {newArrival: false})]));
+
+  let source = url;
+  return (events: ControllerEvents) => {
+    const {onInitialize, onStart, onUpdate, onFinish} = events;
+
+    onInitialize(books);
+
+    let terminate = false;
+    const start = async () => {
+      onStart(books);
+      terminate = false;
+
+      try {
+        const reader = buildBookReader(source);
+        for await (const result of reader) {
+          if (terminate) {
+            return;
+          }
+
+          result.books.forEach((book) => {
+            if (!books.has(book.title)) {
+              books.set(book.title, Object.assign({}, book, {newArrival: true}));
+            }
+          });
+
+          onUpdate(books, result.progress);
+
+          await sleep(1000);
+        }
+        source = url;
+      } catch (error: any) {
+        switch (error.constructor) {
+          case FetchError:
+            source = error.url;
+            break;
+          case Error:
+            console.error(error.message);
+            break;
+          default:
+            console.error(error);
+        }
+      } finally {
+        onFinish(books);
+      }
+    };
+
+    const stop = () => {
+      terminate = true;
+    };
+
+    return {
+      start,
+      startIfEmpty: () => {
+        if (books.size <= 0) {
+          start();
+        }
+      },
+      stop,
+      paused: () => url !== source,
+    };
+  };
+}
+
+function loadCampaign(url: string) {
+  const item = localStorage.getItem(url);
+  if (item) {
+    return JSON.parse(item);
+  } else {
+    return {
+      title: url,
+      url,
+      books: [],
+      updatedAt: Date.now(),
+    };
+  }
 }

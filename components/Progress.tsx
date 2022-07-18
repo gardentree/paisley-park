@@ -21,7 +21,7 @@ export default function Progress(props: Props) {
     } else {
       document.title = "Paisley Park";
     }
-  }, [now, message]);
+  }, [show, message]);
 
   if (!show) {
     return <></>;
