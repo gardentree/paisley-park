@@ -29,7 +29,14 @@ export default function WithList(props: Props) {
   if (focus) {
     selectItems = Object.entries(items).map(([key, title]) => {
       return (
-        <ListGroup.Item onClick={() => onClick(key)} action key={key}>
+        <ListGroup.Item
+          onClick={(event) => {
+            event.preventDefault();
+            onClick(key);
+          }}
+          action
+          key={key}
+        >
           {title}
         </ListGroup.Item>
       );
