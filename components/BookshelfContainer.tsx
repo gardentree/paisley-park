@@ -1,5 +1,5 @@
 import type React from "react";
-import {useState, useEffect, useMemo, useCallback, useRef} from "react";
+import {useState, useEffect, useMemo, useRef} from "react";
 import {Button, Container, Form, Nav, Navbar, NavDropdown} from "react-bootstrap";
 import BookshelfByMagazine from "@/components/BookshelfByMagazine";
 import Progress from "./Progress";
