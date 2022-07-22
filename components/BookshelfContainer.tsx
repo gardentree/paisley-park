@@ -1,7 +1,7 @@
 import type React from "react";
 import {useState, useEffect, useMemo, useCallback, useRef} from "react";
 import {Button, Container, Form, Nav, Navbar, NavDropdown} from "react-bootstrap";
-import Bookshelf from "./Bookshelf";
+import BookshelfByMagazine from "@/components/BookshelfByMagazine";
 import Progress from "./Progress";
 import buildBookReader, {FetchError} from "@/borders/books";
 import {useObjectWithLocalStorage} from "@/hooks/LocalStorage";
@@ -108,7 +108,7 @@ export default function BookshelfContainer(props: Props) {
         </Container>
       </Navbar>
 
-      <Bookshelf books={Array.from(books.values())} mode={mode} />
+      <BookshelfByMagazine books={Array.from(books.values())} mode={mode} />
       <Progress now={progress} processing={processing} />
     </>
   );

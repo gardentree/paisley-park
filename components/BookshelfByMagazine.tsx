@@ -2,14 +2,14 @@ import type React from "react";
 import {Container, Row, Col, Spinner, Accordion} from "react-bootstrap";
 import Book from "./Book";
 import {useSetWithLocalStorage} from "@/hooks/LocalStorage";
-import styles from "@/styles/Bookshelf.module.css";
+import styles from "@/styles/BookshelfByMagazine.module.css";
 
 interface Props {
   books: BookWithState[];
   mode: DisplayMode;
 }
 
-export default function Bookshelf(props: Props) {
+export default function BookshelfByMagazine(props: Props) {
   const {books, mode} = props;
   const [exclusions, toggleExclustion] = useSetWithLocalStorage<string>("exclusions");
 
