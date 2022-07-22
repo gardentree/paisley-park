@@ -108,8 +108,9 @@ export default function BookshelfContainer(props: Props) {
         </Container>
       </Navbar>
 
-      <BookshelfByMagazine books={Array.from(books.values())} mode={mode} />
-      <Progress now={progress} processing={processing} />
+      <BookshelfByMagazine books={Array.from(books.values())} mode={mode}>
+        <Progress now={progress} processing={processing} />
+      </BookshelfByMagazine>
     </>
   );
 }
