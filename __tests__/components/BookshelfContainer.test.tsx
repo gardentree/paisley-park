@@ -117,4 +117,102 @@ describe(BookshelfContainer, () => {
     expect(screen.queryByRole("progressbar")).toBeNull();
     expect(screen.getByText("Update")).toBeInTheDocument();
   });
+  it("when stored in local storage", async () => {
+    const book0 = fakeBook();
+    const book1 = fakeBook();
+    async function* mock() {
+      yield {books: [book1], progress: 100};
+    }
+
+    (buildBookReader as jest.Mock).mockImplementation(mock);
+
+    const url = faker.internet.url();
+    jest.spyOn(window.localStorage.__proto__, "getItem").mockImplementation((key) => {
+      switch (key) {
+        case "exclusions":
+          return null;
+        case url:
+          const campaign = {
+            url: key,
+            title: key,
+            books: [book0],
+            updatedAt: Date.now(),
+          };
+          return JSON.stringify(campaign);
+        default:
+          throw new Error();
+      }
+    });
+
+    act(() => {
+      render(<BookshelfContainer url={url} />);
+    });
+
+    await waitFor(() => expect(screen.getByAltText(book0.title)).toBeInTheDocument());
+
+    expect(screen.getByAltText(book0.title)).toBeInTheDocument();
+    expect(screen.getByText(book0.magazine)).toBeInTheDocument();
+
+    expect(screen.queryByAltText(book1.title)).toBeNull();
+
+    expect(screen.getByText("Update")).toBeInTheDocument();
+  });
+  it("when stored in local storage and start", async () => {
+    const book0 = fakeBook();
+    const book1 = fakeBook();
+    async function* mock() {
+      yield {books: [book1], progress: 100};
+    }
+
+    (buildBookReader as jest.Mock).mockImplementation(mock);
+
+    const url = faker.internet.url();
+    jest.spyOn(window.localStorage.__proto__, "getItem").mockImplementation((key) => {
+      switch (key) {
+        case "exclusions":
+          return null;
+        case url:
+          const campaign = {
+            url: key,
+            title: key,
+            books: [book0],
+            updatedAt: Date.now(),
+          };
+          return JSON.stringify(campaign);
+        default:
+          throw new Error();
+      }
+    });
+
+    act(() => {
+      render(<BookshelfContainer url={url} />);
+    });
+
+    await waitFor(() => expect(screen.getByAltText(book0.title)).toBeInTheDocument());
+
+    (() => {
+      const image = screen.getByAltText(book0.title);
+      expect(image).toBeInTheDocument();
+      expect(image.classList.contains("img-thumbnail")).toBeFalsy();
+      expect(screen.getByText(book0.magazine)).toBeInTheDocument();
+    })();
+
+    expect(screen.queryByAltText(book1.title)).toBeNull();
+
+    const button = screen.getByText("Update");
+    act(() => {
+      button.click();
+    });
+
+    await waitFor(() => expect(screen.getByAltText(book1.title)).toBeInTheDocument());
+
+    expect(screen.queryByAltText(book0.title)).toBeNull();
+
+    (() => {
+      const image = screen.getByAltText(book1.title);
+      expect(image).toBeInTheDocument();
+      expect(image.classList.contains("img-thumbnail")).toBeTruthy();
+      expect(screen.getByText(book1.magazine)).toBeInTheDocument();
+    })();
+  });
 });

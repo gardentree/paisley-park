@@ -125,13 +125,14 @@ interface ControllerEvents {
 
 function createControllerBuilder(url: string) {
   const campaign = loadCampaign(url);
-  const books = new Map<string, BookWithState>(campaign.books.map((book: Book) => [book.title, Object.assign({}, book, {newArrival: false})]));
+  const previous = new Set(campaign.books.map((book) => book.title));
+  const books = new Map<string, BookWithState>();
 
   let source = url;
   return (events: ControllerEvents) => {
     const {onInitialize, onStart, onUpdate, onFinish} = events;
 
-    onInitialize(books);
+    onInitialize(new Map<string, BookWithState>(campaign.books.map((book: Book) => [book.title, Object.assign({}, book, {newArrival: false})])));
 
     let terminate = false;
     const start = async () => {
@@ -147,7 +148,7 @@ function createControllerBuilder(url: string) {
 
           result.books.forEach((book) => {
             if (!books.has(book.title)) {
-              books.set(book.title, Object.assign({}, book, {newArrival: true}));
+              books.set(book.title, Object.assign({}, book, {newArrival: !previous.has(book.title)}));
             }
           });
 
@@ -179,7 +180,7 @@ function createControllerBuilder(url: string) {
     return {
       start,
       startIfEmpty: () => {
-        if (books.size <= 0) {
+        if (previous.size <= 0) {
           start();
         }
       },
@@ -189,7 +190,7 @@ function createControllerBuilder(url: string) {
   };
 }
 
-function loadCampaign(url: string) {
+function loadCampaign(url: string): Campaign {
   const item = localStorage.getItem(url);
   if (item) {
     return JSON.parse(item);
