@@ -86,7 +86,7 @@ export default function BookshelfContainer(props: Props) {
 
   return (
     <>
-      <Navbar expand="md" fixed="top" variant="dark" bg="dark">
+      <Navbar expand="md" sticky="top" variant="dark" bg="dark">
         <Container>
           <Navbar.Brand href="/">PaisleyPark</Navbar.Brand>
           <Form onSubmit={titleHandler} className="flex-fill">

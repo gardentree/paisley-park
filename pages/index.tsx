@@ -26,6 +26,16 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     setCampaigns(loadCampaigns());
+
+    document.documentElement.style.height = "100%";
+    document.body.style.height = "100%";
+    document.getElementById("__next")!.style.height = "100%";
+
+    return () => {
+      document.documentElement.style.height = "initial";
+      document.body.style.height = "initial";
+      document.getElementById("__next")!.style.height = "initial";
+    };
   }, []);
 
   return (
