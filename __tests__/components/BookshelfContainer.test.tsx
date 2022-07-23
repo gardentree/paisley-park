@@ -1,4 +1,4 @@
-import {render, screen, waitFor} from "@testing-library/react";
+import {render, screen, waitFor, within} from "@testing-library/react";
 import {act} from "react-dom/test-utils";
 import {faker} from "@faker-js/faker";
 import BookshelfContainer from "@/components/BookshelfContainer";
@@ -25,13 +25,14 @@ describe(BookshelfContainer, () => {
     (buildBookReader as jest.Mock).mockImplementation(mock);
 
     act(() => {
-      render(<BookshelfContainer url={faker.internet.url()} />);
+      const {container} = render(<BookshelfContainer url={faker.internet.url()} />);
     });
 
     await waitFor(() => expect(screen.getByAltText(book1.title)).toBeInTheDocument());
+    const main = within(screen.getByAltText(book1.title).closest("main")!);
 
-    expect(screen.getByAltText(book1.title)).toBeInTheDocument();
-    expect(screen.getByText(book1.magazine)).toBeInTheDocument();
+    expect(main.getByAltText(book1.title)).toBeInTheDocument();
+    expect(main.getByText(book1.magazine)).toBeInTheDocument();
 
     expect(screen.getByText("Update")).toBeInTheDocument();
   });
@@ -49,12 +50,13 @@ describe(BookshelfContainer, () => {
     });
 
     await waitFor(() => expect(screen.getByAltText(book2.title)).toBeInTheDocument());
+    const main = within(screen.getByAltText(book2.title).closest("main")!);
 
-    expect(screen.getByAltText(book1.title)).toBeInTheDocument();
-    expect(screen.getByText(book1.magazine)).toBeInTheDocument();
+    expect(main.getByAltText(book1.title)).toBeInTheDocument();
+    expect(main.getByText(book1.magazine)).toBeInTheDocument();
 
-    expect(screen.getByAltText(book2.title)).toBeInTheDocument();
-    expect(screen.getByText(book2.magazine)).toBeInTheDocument();
+    expect(main.getByAltText(book2.title)).toBeInTheDocument();
+    expect(main.getByText(book2.magazine)).toBeInTheDocument();
 
     expect(screen.getByText("Update")).toBeInTheDocument();
   });
@@ -72,9 +74,10 @@ describe(BookshelfContainer, () => {
     });
 
     await waitFor(() => expect(screen.getByAltText(book1.title)).toBeInTheDocument());
+    const main = within(screen.getByAltText(book1.title).closest("main")!);
 
-    expect(screen.getByAltText(book1.title)).toBeInTheDocument();
-    expect(screen.getByText(book1.magazine)).toBeInTheDocument();
+    expect(main.getByAltText(book1.title)).toBeInTheDocument();
+    expect(main.getByText(book1.magazine)).toBeInTheDocument();
 
     expect(screen.getByRole("progressbar")).not.toHaveClass("progress-bar-animated");
     expect(screen.getByText("Resume")).toBeInTheDocument();
@@ -93,9 +96,12 @@ describe(BookshelfContainer, () => {
     });
 
     await waitFor(() => expect(screen.getByAltText(book1.title)).toBeInTheDocument());
+    (() => {
+      const main = within(screen.getByAltText(book1.title).closest("main")!);
 
-    expect(screen.getByAltText(book1.title)).toBeInTheDocument();
-    expect(screen.getByText(book1.magazine)).toBeInTheDocument();
+      expect(main.getByAltText(book1.title)).toBeInTheDocument();
+      expect(main.getByText(book1.magazine)).toBeInTheDocument();
+    })();
 
     expect(screen.getByRole("progressbar")).not.toHaveClass("progress-bar-animated");
 
@@ -110,9 +116,12 @@ describe(BookshelfContainer, () => {
       button.click();
     });
     await waitFor(() => expect(screen.getByAltText(book2.title)).toBeInTheDocument());
+    (() => {
+      const main = within(screen.getByAltText(book2.title).closest("main")!);
 
-    expect(screen.getByAltText(book2.title)).toBeInTheDocument();
-    expect(screen.getByText(book2.magazine)).toBeInTheDocument();
+      expect(main.getByAltText(book2.title)).toBeInTheDocument();
+      expect(main.getByText(book2.magazine)).toBeInTheDocument();
+    })();
 
     expect(screen.queryByRole("progressbar")).toBeNull();
     expect(screen.getByText("Update")).toBeInTheDocument();
@@ -149,9 +158,10 @@ describe(BookshelfContainer, () => {
     });
 
     await waitFor(() => expect(screen.getByAltText(book0.title)).toBeInTheDocument());
+    const main = within(screen.getByAltText(book0.title).closest("main")!);
 
-    expect(screen.getByAltText(book0.title)).toBeInTheDocument();
-    expect(screen.getByText(book0.magazine)).toBeInTheDocument();
+    expect(main.getByAltText(book0.title)).toBeInTheDocument();
+    expect(main.getByText(book0.magazine)).toBeInTheDocument();
 
     expect(screen.queryByAltText(book1.title)).toBeNull();
 
@@ -191,10 +201,12 @@ describe(BookshelfContainer, () => {
     await waitFor(() => expect(screen.getByAltText(book0.title)).toBeInTheDocument());
 
     (() => {
-      const image = screen.getByAltText(book0.title);
+      const main = within(screen.getByAltText(book0.title).closest("main")!);
+
+      const image = main.getByAltText(book0.title);
       expect(image).toBeInTheDocument();
       expect(image.classList.contains("img-thumbnail")).toBeFalsy();
-      expect(screen.getByText(book0.magazine)).toBeInTheDocument();
+      expect(main.getByText(book0.magazine)).toBeInTheDocument();
     })();
 
     expect(screen.queryByAltText(book1.title)).toBeNull();
@@ -209,10 +221,12 @@ describe(BookshelfContainer, () => {
     expect(screen.queryByAltText(book0.title)).toBeNull();
 
     (() => {
-      const image = screen.getByAltText(book1.title);
+      const main = within(screen.getByAltText(book1.title).closest("main")!);
+
+      const image = main.getByAltText(book1.title);
       expect(image).toBeInTheDocument();
       expect(image.classList.contains("img-thumbnail")).toBeTruthy();
-      expect(screen.getByText(book1.magazine)).toBeInTheDocument();
+      expect(main.getByText(book1.magazine)).toBeInTheDocument();
     })();
   });
 });

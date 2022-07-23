@@ -1,8 +1,10 @@
 import type React from "react";
 import {ReactElement} from "react";
-import {Container, Row, Col, Spinner, Accordion} from "react-bootstrap";
+import {Container, Row, Col, Spinner, Accordion, Nav} from "react-bootstrap";
 import Book from "./Book";
 import {useSetWithLocalStorage} from "@/hooks/LocalStorage";
+import Link from "next/link";
+import * as Scroll from "react-scroll";
 import styles from "@/styles/BookshelfByMagazine.module.css";
 
 interface Props {
@@ -41,33 +43,52 @@ export default function BookshelfByMagazine(props: Props) {
   };
 
   return (
-    <div>
-      <Container fluid="md">
-        <div className={styles.list}>
-          {entries.map(([name, magazine]) => {
-            return (
-              <Accordion defaultActiveKey={exclusions.has(name) ? null : "0"} flush className={styles.magazine} key={name}>
-                <Accordion.Item eventKey="0">
-                  <Accordion.Header onClick={action}>{name}</Accordion.Header>
-                  <Accordion.Body>
-                    <Row className={styles.books}>
-                      {Array.from(magazine.values()).map((book) => {
-                        return (
-                          <Col className={styles.book} md={2} key={book.title}>
-                            <Book attributes={book} />
-                          </Col>
-                        );
-                      })}
-                    </Row>
-                  </Accordion.Body>
-                </Accordion.Item>
-              </Accordion>
-            );
-          })}
-        </div>
-      </Container>
-      {progress}
-    </div>
+    <Container>
+      <Row>
+        <Col md={2}>
+          <Nav className={styles.sidebar}>
+            <ul className="list-unstyled">
+              {entries.map(([magazine, books]) => {
+                return (
+                  <li key={magazine}>
+                    <Scroll.Link to={magazine} className="link-light" offset={-72}>
+                      {magazine}
+                    </Scroll.Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </Nav>
+        </Col>
+        <Col md={10}>
+          <Container fluid="md">
+            <main className={styles.list}>
+              {entries.map(([name, magazine]) => {
+                return (
+                  <Accordion id={name} defaultActiveKey={exclusions.has(name) ? null : "0"} flush className={styles.magazine} key={name}>
+                    <Accordion.Item eventKey="0">
+                      <Accordion.Header onClick={action}>{name}</Accordion.Header>
+                      <Accordion.Body>
+                        <Row className={styles.books}>
+                          {Array.from(magazine.values()).map((book) => {
+                            return (
+                              <Col className={styles.book} md={2} key={book.title}>
+                                <Book attributes={book} />
+                              </Col>
+                            );
+                          })}
+                        </Row>
+                      </Accordion.Body>
+                    </Accordion.Item>
+                  </Accordion>
+                );
+              })}
+            </main>
+          </Container>
+          {progress}
+        </Col>
+      </Row>
+    </Container>
   );
 }
 

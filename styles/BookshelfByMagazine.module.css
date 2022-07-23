@@ -23,3 +23,24 @@
   justify-content: center;
   height: 100%;
 }
+
+.sidebar {
+  position: sticky;
+  overflow-y: auto;
+  height: 100vh;
+
+  top: 72px;
+}
+.sidebar ul {
+  width: 100%;
+  margin-top: -0.125rem;
+}
+.sidebar ul li a {
+  display: block;
+  padding: 0.125rem 0;
+
+  font-size: smaller;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
