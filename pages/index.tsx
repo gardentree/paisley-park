@@ -27,19 +27,20 @@ const Home: NextPage = () => {
   useEffect(() => {
     setCampaigns(loadCampaigns());
 
-    document.documentElement.style.height = "100%";
-    document.body.style.height = "100%";
-    document.getElementById("__next")!.style.height = "100%";
+    const parents = getParents();
+    for (const parent of parents) {
+      parent.style.height = "100%";
+    }
 
     return () => {
-      document.documentElement.style.height = "initial";
-      document.body.style.height = "initial";
-      document.getElementById("__next")!.style.height = "initial";
+      for (const parent of parents) {
+        parent.style.height = "initial";
+      }
     };
   }, []);
 
   return (
-    <div className={styles.container}>
+    <div id="entry" className={styles.container}>
       <Form onSubmit={handleSubmit}>
         <WithList items={campaigns} onClick={handleClick}>
           <FormControl name="url" type="url" placeholder="Enter url" defaultValue="" />
@@ -68,4 +69,15 @@ function loadCampaigns(): Record<string, string> {
     },
     campaigns
   );
+}
+
+function getParents(): HTMLElement[] {
+  const parents = [];
+  let target = document.getElementById("entry");
+  while (target) {
+    parents.push(target);
+    target = target.parentElement;
+  }
+
+  return parents;
 }
