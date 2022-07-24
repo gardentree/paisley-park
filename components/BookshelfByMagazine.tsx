@@ -10,11 +10,10 @@ import styles from "@/styles/BookshelfByMagazine.module.css";
 interface Props {
   books: BookWithState[];
   mode: DisplayMode;
-  children: ReactElement;
 }
 
 export default function BookshelfByMagazine(props: Props) {
-  const {books, mode, children: progress} = props;
+  const {books, mode} = props;
   const [exclusions, toggleExclustion] = useSetWithLocalStorage<string>("exclusions");
 
   if (books.length <= 0) {
@@ -85,7 +84,6 @@ export default function BookshelfByMagazine(props: Props) {
               })}
             </main>
           </Container>
-          {progress}
         </Col>
       </Row>
     </Container>
