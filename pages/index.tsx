@@ -62,11 +62,13 @@ function loadCampaigns(): Record<string, string> {
   }
 
   return Object.assign(
-    {
-      "https://www.amazon.co.jp/s?rh=n%3A8486051051&fs=true": "期間限定無料",
-      "https://www.amazon.co.jp/s?rh=n%3A8138289051&fs=true": "無料",
-      "https://www.amazon.co.jp/s?rh=n%3A7962654051&fs=true": "割引",
-    },
+    Object.fromEntries(
+      Object.entries({
+        "https://www.amazon.co.jp/s?rh=n%3A8486051051&fs=true": "期間限定無料",
+        "https://www.amazon.co.jp/s?rh=n%3A8138289051&fs=true": "無料",
+        "https://www.amazon.co.jp/s?rh=n%3A7962654051&fs=true": "セール",
+      }).map(([url, title]) => [url, `[${title}] ${url}`])
+    ),
     campaigns
   );
 }
