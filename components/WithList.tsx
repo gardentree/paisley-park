@@ -1,8 +1,7 @@
 import type React from "react";
-import {cloneElement, ReactElement, ReactNode, useState} from "react";
+import {cloneElement, ReactElement, useState} from "react";
 import {ListGroup} from "react-bootstrap";
 import styles from "@/styles/WithList.module.css";
-import Link from "next/link";
 
 interface Props {
   children: ReactElement;

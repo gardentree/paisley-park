@@ -1,8 +1,7 @@
 import type {NextPage} from "next";
 import type React from "react";
 import {useRouter} from "next/router";
-import {Form, FormControl, ListGroup} from "react-bootstrap";
-import {useObjectWithLocalStorage} from "@/hooks/LocalStorage";
+import {Form, FormControl} from "react-bootstrap";
 import styles from "@/styles/Entry.module.css";
 import {useEffect, useState} from "react";
 import WithList from "@/components/WithList";

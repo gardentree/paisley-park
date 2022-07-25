@@ -4,7 +4,15 @@ import {faker} from "@faker-js/faker";
 import BookshelfContainer from "@/components/BookshelfContainer";
 import buildBookReader, {FetchError} from "@/borders/books";
 
-jest.mock("@/borders/books");
+jest.mock("@/borders/books", () => {
+  const originalModule = jest.requireActual("@/borders/books");
+
+  return {
+    __esModule: true,
+    ...originalModule,
+    default: jest.fn(),
+  };
+});
 
 function fakeBook(): Book {
   return {
@@ -25,7 +33,7 @@ describe(BookshelfContainer, () => {
     (buildBookReader as jest.Mock).mockImplementation(mock);
 
     act(() => {
-      const {container} = render(<BookshelfContainer url={faker.internet.url()} />);
+      render(<BookshelfContainer url={faker.internet.url()} />);
     });
 
     await waitFor(() => expect(screen.getByAltText(book1.title)).toBeInTheDocument());

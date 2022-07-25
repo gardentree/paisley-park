@@ -77,7 +77,7 @@ export default function BookshelfContainer(props: Props) {
   const titleHandler: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
 
-    const title = event.currentTarget.elements["title" as any] as HTMLInputElement;
+    const title = event.currentTarget.elements.namedItem("title") as HTMLInputElement;
 
     setCampaignRef.current((previous) => ({...previous, title: title.value}));
 
@@ -157,16 +157,18 @@ function createControllerBuilder(url: string) {
           await sleep(1000);
         }
         source = url;
-      } catch (error: any) {
-        switch (error.constructor) {
-          case FetchError:
-            source = error.url;
-            break;
-          case Error:
-            console.error(error.message);
-            break;
-          default:
-            console.error(error);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          switch (error.constructor) {
+            case FetchError:
+              source = (error as FetchError).url;
+              break;
+            default:
+              console.error(error.message);
+              break;
+          }
+        } else {
+          console.error(error);
         }
       } finally {
         onFinish(books);

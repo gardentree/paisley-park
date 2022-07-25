@@ -1,9 +1,7 @@
 import type React from "react";
-import {ReactElement} from "react";
 import {Container, Row, Col, Spinner, Accordion, Nav} from "react-bootstrap";
 import Book from "./Book";
 import {useSetWithLocalStorage} from "@/hooks/LocalStorage";
-import Link from "next/link";
 import * as Scroll from "react-scroll";
 import styles from "@/styles/BookshelfByMagazine.module.css";
 
@@ -47,7 +45,7 @@ export default function BookshelfByMagazine(props: Props) {
         <Col md={2}>
           <Nav className={styles.sidebar}>
             <ul className="list-unstyled">
-              {entries.map(([magazine, books]) => {
+              {entries.map(([magazine]) => {
                 return (
                   <li key={magazine}>
                     <Scroll.Link to={magazine} className="link-light" offset={-72}>
