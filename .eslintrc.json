@@ -1,5 +1,5 @@
 {
-  "extends": ["plugin:@typescript-eslint/recommended", "next/core-web-vitals"],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "next/core-web-vitals"],
   "rules": {
     "@next/next/no-img-element": "off",
     "@typescript-eslint/no-non-null-assertion": ["off"]
