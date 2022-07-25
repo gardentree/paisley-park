@@ -16,7 +16,12 @@ if (typeof global.fetch === "undefined") {
   global.Response = whatwg.Response;
 }
 
-import * as utility from "@/libraries/utility";
-jest.spyOn(utility, "sleep").mockImplementation(() => {
-  return Promise.resolve();
+jest.mock("@/libraries/utility", () => {
+  const originalModule = jest.requireActual("@/libraries/utility");
+
+  return {
+    __esModule: true,
+    ...originalModule,
+    sleep: () => Promise.resolve(),
+  };
 });
