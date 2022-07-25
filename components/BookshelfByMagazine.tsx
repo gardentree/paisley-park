@@ -60,14 +60,14 @@ export default function BookshelfByMagazine(props: Props) {
         <Col md={10}>
           <Container fluid="md">
             <main className={styles.list}>
-              {entries.map(([name, magazine]) => {
+              {entries.map(([magazine, books]) => {
                 return (
-                  <Accordion id={name} defaultActiveKey={exclusions.has(name) ? null : "0"} flush className={styles.magazine} key={name}>
+                  <Accordion id={magazine} defaultActiveKey={exclusions.has(magazine) ? null : "0"} flush className={styles.magazine} key={magazine}>
                     <Accordion.Item eventKey="0">
-                      <Accordion.Header onClick={action}>{name}</Accordion.Header>
+                      <Accordion.Header onClick={action}>{magazine}</Accordion.Header>
                       <Accordion.Body>
                         <Row className={styles.books}>
-                          {Array.from(magazine.values()).map((book) => {
+                          {Array.from(books.values()).map((book) => {
                             return (
                               <Col className={styles.book} md={2} key={book.title}>
                                 <Book attributes={book} />
