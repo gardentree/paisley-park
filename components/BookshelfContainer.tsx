@@ -39,6 +39,7 @@ export default function BookshelfContainer(props: Props) {
         },
         onStart: (books) => {
           setProcessing(true);
+          setMode("newArrival");
           setBooks(books);
         },
         onUpdate: (books, progress) => {

@@ -44,7 +44,7 @@ describe(BookshelfContainer, () => {
 
     const navigation = within(screen.getByRole("navigation"));
     expect(navigation.getByText("Update")).toBeInTheDocument();
-    expect(navigation.getByText("全て")).toBeInTheDocument();
+    expect(navigation.getByText("新着のみ")).toBeInTheDocument();
   });
   it("when multi book", async () => {
     const book1 = fakeBook();
@@ -69,7 +69,7 @@ describe(BookshelfContainer, () => {
 
     const navigation = within(screen.getByRole("navigation"));
     expect(navigation.getByText("Update")).toBeInTheDocument();
-    expect(navigation.getByText("全て")).toBeInTheDocument();
+    expect(navigation.getByText("新着のみ")).toBeInTheDocument();
   });
   it("when raise server error", async () => {
     const book1 = fakeBook();
@@ -92,7 +92,7 @@ describe(BookshelfContainer, () => {
 
     const navigation = within(screen.getByRole("navigation"));
     expect(navigation.getByText("Resume")).toBeInTheDocument();
-    expect(navigation.getByText("全て")).toBeInTheDocument();
+    expect(navigation.getByText("新着のみ")).toBeInTheDocument();
 
     expect(screen.getByRole("progressbar")).not.toHaveClass("progress-bar-animated");
   });
@@ -122,7 +122,7 @@ describe(BookshelfContainer, () => {
     const navigation = within(screen.getByRole("navigation"));
     const button = navigation.getByText("Resume");
     expect(button).toBeInTheDocument();
-    expect(navigation.getByText("全て")).toBeInTheDocument();
+    expect(navigation.getByText("新着のみ")).toBeInTheDocument();
 
     (buildBookReader as jest.Mock).mockImplementation(async function* mock() {
       yield {books: [book2], progress: 100};
@@ -141,7 +141,7 @@ describe(BookshelfContainer, () => {
     })();
 
     expect(navigation.getByText("Update")).toBeInTheDocument();
-    expect(navigation.getByText("全て")).toBeInTheDocument();
+    expect(navigation.getByText("新着のみ")).toBeInTheDocument();
 
     expect(screen.queryByRole("progressbar")).toBeNull();
   });
@@ -251,6 +251,6 @@ describe(BookshelfContainer, () => {
       expect(main.getByText(book1.magazine)).toBeInTheDocument();
     })();
 
-    expect(navigation.getByText("全て")).toBeInTheDocument();
+    expect(navigation.getByText("新着のみ")).toBeInTheDocument();
   });
 });
