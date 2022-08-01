@@ -44,6 +44,7 @@ describe(BookshelfContainer, () => {
 
     const navigation = within(screen.getByRole("navigation"));
     expect(navigation.getByText("Update")).toBeInTheDocument();
+    expect(navigation.getByText("全て")).toBeInTheDocument();
   });
   it("when multi book", async () => {
     const book1 = fakeBook();
@@ -68,6 +69,7 @@ describe(BookshelfContainer, () => {
 
     const navigation = within(screen.getByRole("navigation"));
     expect(navigation.getByText("Update")).toBeInTheDocument();
+    expect(navigation.getByText("全て")).toBeInTheDocument();
   });
   it("when raise server error", async () => {
     const book1 = fakeBook();
@@ -90,6 +92,7 @@ describe(BookshelfContainer, () => {
 
     const navigation = within(screen.getByRole("navigation"));
     expect(navigation.getByText("Resume")).toBeInTheDocument();
+    expect(navigation.getByText("全て")).toBeInTheDocument();
 
     expect(screen.getByRole("progressbar")).not.toHaveClass("progress-bar-animated");
   });
@@ -116,8 +119,10 @@ describe(BookshelfContainer, () => {
 
     expect(screen.getByRole("progressbar")).not.toHaveClass("progress-bar-animated");
 
-    const button = screen.getByText("Resume");
+    const navigation = within(screen.getByRole("navigation"));
+    const button = navigation.getByText("Resume");
     expect(button).toBeInTheDocument();
+    expect(navigation.getByText("全て")).toBeInTheDocument();
 
     (buildBookReader as jest.Mock).mockImplementation(async function* mock() {
       yield {books: [book2], progress: 100};
@@ -135,8 +140,8 @@ describe(BookshelfContainer, () => {
       expect(main.getByText(book2.magazine)).toBeInTheDocument();
     })();
 
-    const navigation = within(screen.getByRole("navigation"));
     expect(navigation.getByText("Update")).toBeInTheDocument();
+    expect(navigation.getByText("全て")).toBeInTheDocument();
 
     expect(screen.queryByRole("progressbar")).toBeNull();
   });
@@ -180,6 +185,7 @@ describe(BookshelfContainer, () => {
 
     const navigation = within(screen.getByRole("navigation"));
     expect(navigation.getByText("Update")).toBeInTheDocument();
+    expect(navigation.getByText("全て")).toBeInTheDocument();
   });
   it("when stored in local storage and start", async () => {
     const book0 = fakeBook();
@@ -226,6 +232,8 @@ describe(BookshelfContainer, () => {
 
     const navigation = within(screen.getByRole("navigation"));
     const button = navigation.getByText("Update");
+    expect(navigation.getByText("全て")).toBeInTheDocument();
+
     act(() => {
       button.click();
     });
@@ -242,5 +250,7 @@ describe(BookshelfContainer, () => {
       expect(image.classList.contains("img-thumbnail")).toBeTruthy();
       expect(main.getByText(book1.magazine)).toBeInTheDocument();
     })();
+
+    expect(navigation.getByText("全て")).toBeInTheDocument();
   });
 });
