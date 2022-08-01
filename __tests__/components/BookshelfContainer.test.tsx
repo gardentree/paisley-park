@@ -149,13 +149,12 @@ describe(BookshelfContainer, () => {
         case "exclusions":
           return null;
         case url:
-          const campaign = {
+          return JSON.stringify({
             url: key,
             title: key,
             books: [book0],
             updatedAt: Date.now(),
-          };
-          return JSON.stringify(campaign);
+          });
         default:
           throw new Error();
       }
@@ -190,13 +189,12 @@ describe(BookshelfContainer, () => {
         case "exclusions":
           return null;
         case url:
-          const campaign = {
+          return JSON.stringify({
             url: key,
             title: key,
             books: [book0],
             updatedAt: Date.now(),
-          };
-          return JSON.stringify(campaign);
+          });
         default:
           throw new Error();
       }
