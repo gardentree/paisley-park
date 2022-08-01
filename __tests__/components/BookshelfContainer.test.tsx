@@ -37,12 +37,13 @@ describe(BookshelfContainer, () => {
     });
 
     await waitFor(() => expect(screen.getByAltText(book1.title)).toBeInTheDocument());
-    const main = within(screen.getByAltText(book1.title).closest("main")!);
 
+    const main = within(screen.getByAltText(book1.title).closest("main")!);
     expect(main.getByAltText(book1.title)).toBeInTheDocument();
     expect(main.getByText(book1.magazine)).toBeInTheDocument();
 
-    expect(screen.getByText("Update")).toBeInTheDocument();
+    const navigation = within(screen.getByRole("navigation"));
+    expect(navigation.getByText("Update")).toBeInTheDocument();
   });
   it("when multi book", async () => {
     const book1 = fakeBook();
@@ -58,15 +59,15 @@ describe(BookshelfContainer, () => {
     });
 
     await waitFor(() => expect(screen.getByAltText(book2.title)).toBeInTheDocument());
-    const main = within(screen.getByAltText(book2.title).closest("main")!);
 
+    const main = within(screen.getByAltText(book2.title).closest("main")!);
     expect(main.getByAltText(book1.title)).toBeInTheDocument();
     expect(main.getByText(book1.magazine)).toBeInTheDocument();
-
     expect(main.getByAltText(book2.title)).toBeInTheDocument();
     expect(main.getByText(book2.magazine)).toBeInTheDocument();
 
-    expect(screen.getByText("Update")).toBeInTheDocument();
+    const navigation = within(screen.getByRole("navigation"));
+    expect(navigation.getByText("Update")).toBeInTheDocument();
   });
   it("when raise server error", async () => {
     const book1 = fakeBook();
@@ -82,13 +83,15 @@ describe(BookshelfContainer, () => {
     });
 
     await waitFor(() => expect(screen.getByAltText(book1.title)).toBeInTheDocument());
-    const main = within(screen.getByAltText(book1.title).closest("main")!);
 
+    const main = within(screen.getByAltText(book1.title).closest("main")!);
     expect(main.getByAltText(book1.title)).toBeInTheDocument();
     expect(main.getByText(book1.magazine)).toBeInTheDocument();
 
+    const navigation = within(screen.getByRole("navigation"));
+    expect(navigation.getByText("Resume")).toBeInTheDocument();
+
     expect(screen.getByRole("progressbar")).not.toHaveClass("progress-bar-animated");
-    expect(screen.getByText("Resume")).toBeInTheDocument();
   });
   it("when raise server error and resume", async () => {
     const book1 = fakeBook();
@@ -124,6 +127,7 @@ describe(BookshelfContainer, () => {
       button.click();
     });
     await waitFor(() => expect(screen.getByAltText(book2.title)).toBeInTheDocument());
+
     (() => {
       const main = within(screen.getByAltText(book2.title).closest("main")!);
 
@@ -131,8 +135,10 @@ describe(BookshelfContainer, () => {
       expect(main.getByText(book2.magazine)).toBeInTheDocument();
     })();
 
+    const navigation = within(screen.getByRole("navigation"));
+    expect(navigation.getByText("Update")).toBeInTheDocument();
+
     expect(screen.queryByRole("progressbar")).toBeNull();
-    expect(screen.getByText("Update")).toBeInTheDocument();
   });
   it("when stored in local storage", async () => {
     const book0 = fakeBook();
@@ -165,14 +171,15 @@ describe(BookshelfContainer, () => {
     });
 
     await waitFor(() => expect(screen.getByAltText(book0.title)).toBeInTheDocument());
-    const main = within(screen.getByAltText(book0.title).closest("main")!);
 
+    const main = within(screen.getByAltText(book0.title).closest("main")!);
     expect(main.getByAltText(book0.title)).toBeInTheDocument();
     expect(main.getByText(book0.magazine)).toBeInTheDocument();
 
     expect(screen.queryByAltText(book1.title)).toBeNull();
 
-    expect(screen.getByText("Update")).toBeInTheDocument();
+    const navigation = within(screen.getByRole("navigation"));
+    expect(navigation.getByText("Update")).toBeInTheDocument();
   });
   it("when stored in local storage and start", async () => {
     const book0 = fakeBook();
@@ -217,7 +224,8 @@ describe(BookshelfContainer, () => {
 
     expect(screen.queryByAltText(book1.title)).toBeNull();
 
-    const button = screen.getByText("Update");
+    const navigation = within(screen.getByRole("navigation"));
+    const button = navigation.getByText("Update");
     act(() => {
       button.click();
     });
