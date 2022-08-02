@@ -54,20 +54,32 @@ export default Home;
 function loadCampaigns(): Record<string, string> {
   const keys = Object.keys(localStorage).filter((key) => key.startsWith("http"));
 
+  if (keys.length <= 0) {
+    const defaults = Object.entries({
+      "https://www.amazon.co.jp/s?rh=n%3A8486051051&fs=true": "期間限定無料",
+      "https://www.amazon.co.jp/s?rh=n%3A8138289051&fs=true": "無料",
+      "https://www.amazon.co.jp/s?rh=n%3A7962654051&fs=true": "セール",
+    });
+    for (const [url, title] of defaults) {
+      localStorage.setItem(
+        url,
+        JSON.stringify({
+          title,
+          url,
+          books: [],
+          updatedAt: Date.now(),
+        })
+      );
+    }
+  }
+
   const campaigns: Record<string, string> = {};
   for (const key of keys) {
     const campaign = JSON.parse(localStorage.getItem(key)!);
     campaigns[campaign.url] = campaign.title;
   }
 
-  return Object.assign(
-    {
-      "https://www.amazon.co.jp/s?rh=n%3A8486051051&fs=true": "期間限定無料",
-      "https://www.amazon.co.jp/s?rh=n%3A8138289051&fs=true": "無料",
-      "https://www.amazon.co.jp/s?rh=n%3A7962654051&fs=true": "セール",
-    },
-    campaigns
-  );
+  return campaigns;
 }
 
 function getParents(): HTMLElement[] {
