@@ -36,6 +36,7 @@ describe(handler, () => {
               </span>
             </div>
           </div>
+        </div>
       </div>
     `,
       {status: 200}
