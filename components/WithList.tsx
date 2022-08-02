@@ -1,6 +1,6 @@
 import type React from "react";
 import {cloneElement, ReactElement, useState} from "react";
-import {ListGroup} from "react-bootstrap";
+import {Badge, ListGroup} from "react-bootstrap";
 import styles from "@/styles/WithList.module.css";
 
 interface Props {
@@ -33,10 +33,16 @@ export default function WithList(props: Props) {
             event.preventDefault();
             onClick(key);
           }}
+          className="d-flex align-items-start"
           action
           key={key}
         >
-          {title}
+          <div className="me-auto">{key}</div>
+          {key !== title && (
+            <Badge bg="primary" pill>
+              {title}
+            </Badge>
+          )}
         </ListGroup.Item>
       );
     });
