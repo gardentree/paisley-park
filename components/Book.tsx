@@ -15,7 +15,6 @@ export default function Book(props: Props) {
         placement="bottom"
         overlay={
           <Tooltip id={`tooltip-bottom`}>
-            {attributes.newArrival}
             {attributes.title}
           </Tooltip>
         }
