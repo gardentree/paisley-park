@@ -23,6 +23,7 @@ export function crawlBooks(document: Document): Book[] {
           magazine: magazine,
           anchor: new URL(anchor.href, "https://www.amazon.co.jp").toString(),
           image: section.querySelector("img")!.src,
+          review: extractReview(section),
         });
       }
     } catch (error) {
@@ -39,6 +40,16 @@ export function extractMagazine(section: Element): string {
   const matcher = HEAD_PATTRN.exec(head.textContent!.trim());
 
   return matcher ? matcher[1] : "(その他)";
+}
+export function extractReview(section: Element): Review {
+  const matcher = /5つ星のうち(\d\.\d)\s+([\d,]+)/.exec(section.textContent!)!;
+  const star = matcher[1];
+  const count = matcher[2];
+
+  return {
+    star: Number.parseFloat(star),
+    count: Number.parseInt(count.replaceAll(/,/g, "")),
+  };
 }
 
 export function crawlPagination(document: Document): Pagination {

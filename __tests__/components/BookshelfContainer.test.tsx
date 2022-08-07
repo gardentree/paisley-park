@@ -20,6 +20,10 @@ function fakeBook(): Book {
     magazine: faker.music.genre(),
     anchor: faker.internet.url(),
     image: faker.internet.avatar(),
+    review: {
+      star: faker.datatype.number({min: 0, max: 5}),
+      count: faker.datatype.number({min: 0, max: 10000}),
+    },
   };
 }
 

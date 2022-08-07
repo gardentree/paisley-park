@@ -21,6 +21,10 @@ describe(handler, () => {
               <a href="/1">「鋼の錬金術師」全27巻中の1巻</a>
             </div>
           </div>
+          <div>
+            <span>5つ星のうち4.7</span>
+            <span>2,588</span>
+          </div>
         </div>
         <div class="s-result-item">
           <div>
@@ -58,6 +62,10 @@ describe(handler, () => {
               magazine: "デジタル版ガンガンコミックス",
               anchor: "http://localhost/1",
               image: "http://localhost/1.jpg",
+              review: {
+                star: 4.7,
+                count: 2588,
+              },
             },
           ],
           pagination: {
@@ -128,6 +136,10 @@ describe(crawlBooks, () => {
             <div>
               <a href="/1">「鋼の錬金術師」全27巻中の1巻</a>
             </div>
+            <div>
+              <span>5つ星のうち5.0</span>
+              <span>2,588</span>
+            </div>
           </div>
         </div>
         <div class="s-result-item">
@@ -138,6 +150,10 @@ describe(crawlBooks, () => {
             <h2>ARMS（１） (少年サンデーコミックス)</h2>
             <div>
               <a href="/2">「ＡＲＭＳ」全22巻中の1巻 </a>
+            </div>
+            <div>
+              <span>5つ星のうち4.7</span>
+              <span>588</span>
             </div>
           </div>
         </div>
@@ -151,12 +167,20 @@ describe(crawlBooks, () => {
         magazine: "デジタル版ガンガンコミックス",
         anchor: "http://localhost/1",
         image: "http://localhost/1.jpg",
+        review: {
+          star: 5.0,
+          count: 2588,
+        },
       },
       {
         title: "ＡＲＭＳ",
         magazine: "少年サンデーコミックス",
         anchor: "http://localhost/2",
         image: "http://localhost/2.jpg",
+        review: {
+          star: 4.7,
+          count: 588,
+        },
       },
     ]);
   });

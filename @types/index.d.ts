@@ -7,6 +7,11 @@ interface Book {
   magazine: string;
   anchor: string;
   image: string;
+  review: Review;
+}
+interface Review {
+  star: number;
+  count: number;
 }
 interface BookWithState extends Book {
   newArrival: boolean;
