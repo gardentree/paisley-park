@@ -1,5 +1,5 @@
 import {testApiHandler} from "next-test-api-route-handler";
-import handler, {crawlBooks, extractMagazine, crawlPagination} from "@/pages/api/books/[url]";
+import handler, {crawlBooks, extractMagazine, crawlPagination, extractReview} from "@/pages/api/books/[url]";
 
 describe(handler, () => {
   let fetchSpy: jest.SpyInstance;
@@ -214,6 +214,22 @@ describe(extractMagazine, () => {
 
     const actual = extractMagazine(section);
     expect(actual).toBe("(その他)");
+  });
+});
+
+describe(extractReview, () => {
+  it("when preview is present", () => {
+    const section = document.createElement("div");
+    section.innerHTML = "5つ星のうち4.0 123";
+
+    const actual = extractReview(section);
+    expect(actual).toStrictEqual({star: 4.0, count: 123});
+  });
+  it("when preview is not present", () => {
+    const section = document.createElement("div");
+
+    const actual = extractReview(section);
+    expect(actual).toStrictEqual({star: 0, count: 0});
   });
 });
 

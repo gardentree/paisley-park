@@ -43,13 +43,20 @@ export function extractMagazine(section: Element): string {
 }
 export function extractReview(section: Element): Review {
   const matcher = /5つ星のうち(\d\.\d)\s+([\d,]+)/.exec(section.textContent!)!;
-  const star = matcher[1];
-  const count = matcher[2];
+  if (matcher) {
+    const star = matcher[1];
+    const count = matcher[2];
 
-  return {
-    star: Number.parseFloat(star),
-    count: Number.parseInt(count.replaceAll(/,/g, "")),
-  };
+    return {
+      star: Number.parseFloat(star),
+      count: Number.parseInt(count.replaceAll(/,/g, "")),
+    };
+  } else {
+    return {
+      star: 0,
+      count: 0,
+    };
+  }
 }
 
 export function crawlPagination(document: Document): Pagination {
