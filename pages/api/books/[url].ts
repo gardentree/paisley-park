@@ -1,8 +1,12 @@
 import type {NextApiRequest, NextApiResponse} from "next";
 import jsdom from "jsdom";
+import fs from "fs";
+import pathname from "path";
 
 const TITLE_PATTRN = /「(.+)」\s*全\d+[巻話]中の\d+[巻話]/;
 const HEAD_PATTRN = /^.+\((.{3,})\)$/;
+
+const DEVELOPMENT = process.env.NODE_ENV === "development";
 
 export function crawlBooks(document: Document): Book[] {
   const books: Map<string, Book> = new Map();
@@ -95,7 +99,16 @@ export default async function handler(request: NextApiRequest, response: NextApi
     } catch (error) {
       console.info(amazon.url);
       console.info(error);
-      console.info(document.body.textContent);
+
+      if (DEVELOPMENT) {
+        const temporary = "tmp";
+        if (!fs.existsSync(temporary)) {
+          await fs.promises.mkdir(temporary);
+        }
+        fs.writeFile(pathname.join(temporary, encodeURIComponent(amazon.url)), dom.serialize(), (error) => {
+          console.error(error);
+        });
+      }
 
       return response.status(503).json({
         message: amazon.url,
