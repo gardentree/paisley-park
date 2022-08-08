@@ -25,21 +25,10 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     setCampaigns(loadCampaigns());
-
-    const parents = getParents();
-    for (const parent of parents) {
-      parent.style.height = "100%";
-    }
-
-    return () => {
-      for (const parent of parents) {
-        parent.style.height = "initial";
-      }
-    };
   }, []);
 
   return (
-    <div id="entry" className={styles.container}>
+    <div className={styles.container}>
       <Form onSubmit={handleSubmit}>
         <WithList items={campaigns} onClick={handleClick}>
           <FormControl name="url" type="url" placeholder="Enter url" defaultValue="" />
@@ -80,15 +69,4 @@ function loadCampaigns(): Record<string, string> {
   }
 
   return campaigns;
-}
-
-function getParents(): HTMLElement[] {
-  const parents = [];
-  let target = document.getElementById("entry");
-  while (target) {
-    parents.push(target);
-    target = target.parentElement;
-  }
-
-  return parents;
 }
