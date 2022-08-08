@@ -5,6 +5,7 @@ import pathname from "path";
 
 const TITLE_PATTRN = /「(.+)」\s*全\d+[巻話]中の\d+[巻話]/;
 const HEAD_PATTRN = /^.+\((.{3,})\)$/;
+const REVIEW_PATTEN = /5つ星のうち(\d\.\d)\s+([\d,]+)/;
 
 const DEVELOPMENT = process.env.NODE_ENV === "development";
 
@@ -46,7 +47,7 @@ export function extractMagazine(section: Element): string {
   return matcher ? matcher[1] : "(その他)";
 }
 export function extractReview(section: Element): Review {
-  const matcher = /5つ星のうち(\d\.\d)\s+([\d,]+)/.exec(section.textContent!)!;
+  const matcher = REVIEW_PATTEN.exec(section.textContent!)!;
   if (matcher) {
     const star = matcher[1];
     const count = matcher[2];
