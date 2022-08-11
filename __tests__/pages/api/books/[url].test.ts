@@ -184,6 +184,41 @@ describe(crawlBooks, () => {
       },
     ]);
   });
+  it("when number of volumes is not present", () => {
+    document.body.innerHTML = `
+      <div class="s-main-slot">
+        <div class="s-result-item">
+          <div>
+            <img src="1.jpg"/>
+          </div>
+          <div>
+            <h2>鋼の錬金術師 1巻 (デジタル版ガンガンコミックス)</h2>
+            <div>
+              <a href="/1">鋼の錬金術師</a>
+            </div>
+            <div>
+              <span>5つ星のうち5.0</span>
+              <span>2,588</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const actual = crawlBooks(document);
+    expect(actual).toStrictEqual([
+      {
+        title: "鋼の錬金術師",
+        magazine: "デジタル版ガンガンコミックス",
+        anchor: "http://localhost/1",
+        image: "http://localhost/1.jpg",
+        review: {
+          star: 5.0,
+          count: 2588,
+        },
+      },
+    ]);
+  });
 });
 
 describe(extractMagazine, () => {

@@ -19,7 +19,7 @@ export function crawlBooks(document: Document): Book[] {
         return;
       }
 
-      const title = TITLE_PATTRN.exec(anchor.textContent!.trim())![1];
+      const title = extractTitle(anchor);
       if (!books.has(title)) {
         const magazine = extractMagazine(section);
 
@@ -39,6 +39,16 @@ export function crawlBooks(document: Document): Book[] {
   });
 
   return Array.from(books.values());
+}
+export function extractTitle(section: Element) {
+  const content = section.textContent!.trim();
+  const matcher = TITLE_PATTRN.exec(content);
+
+  if (matcher) {
+    return matcher[1];
+  } else {
+    return content;
+  }
 }
 export function extractMagazine(section: Element): string {
   const head = section.querySelector("h2")!;
