@@ -48,7 +48,7 @@ export default function BookshelfByMagazine(props: Props) {
               {entries.map(([magazine]) => {
                 return (
                   <li key={magazine}>
-                    <Scroll.Link to={magazine} className="link-light" offset={-72}>
+                    <Scroll.Link to={magazine} className={exclusions.has(magazine) ? "link-secondary" : "link-light"} offset={-72}>
                       {magazine}
                     </Scroll.Link>
                   </li>
