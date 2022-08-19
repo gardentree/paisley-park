@@ -6,6 +6,7 @@ import Progress from "./Progress";
 import buildBookReader, {FetchError} from "@/borders/books";
 import {useObjectWithLocalStorage} from "@/hooks/LocalStorage";
 import {sleep} from "@/libraries/utility";
+import {Heat} from "@/libraries/heat";
 
 interface Props {
   url: string;
@@ -16,6 +17,8 @@ const MODE: {[key in DisplayMode]: string} = {
   newArrival: "新着のみ",
 };
 
+const HEAT = new Heat(1024);
+
 export default function BookshelfContainer(props: Props) {
   const {url} = props;
   const [campaign, setCampaign] = useObjectWithLocalStorage<Campaign>(url, {
@@ -25,31 +28,33 @@ export default function BookshelfContainer(props: Props) {
     updatedAt: Date.now(),
   });
   const setCampaignRef = useRef(setCampaign);
-  const [books, setBooks] = useState(new Map());
+  const [allBooks, setAllBooks] = useState<BookPlusNewArrival[]>([]);
   const [progress, setProgress] = useState(0);
   const [processing, setProcessing] = useState(false);
   const [mode, setMode] = useState<DisplayMode>("all");
+
+  const books = useMemo(() => allBooks.map((book) => Object.assign({}, book, {heat: HEAT.measure(book.review.count)})), [allBooks]);
 
   const builder = useMemo(() => createControllerBuilder(url), [url]);
   const controller = useMemo(
     () =>
       builder({
         onInitialize: (books) => {
-          setBooks(books);
+          setAllBooks(books);
         },
         onStart: (books) => {
           setProcessing(true);
           setMode("newArrival");
-          setBooks(books);
+          setAllBooks(books);
         },
         onUpdate: (books, progress) => {
-          setBooks(books);
+          setAllBooks(books);
           setProgress(progress);
         },
         onFinish: (books) => {
           setCampaignRef.current((previous) => ({
             ...previous,
-            books: Array.from(books.values()),
+            books: books,
             updatedAt: Date.now(),
           }));
           setProcessing(false);
@@ -109,35 +114,35 @@ export default function BookshelfContainer(props: Props) {
         </Container>
       </Navbar>
 
-      <BookshelfByMagazine books={Array.from(books.values())} mode={mode} />
+      <BookshelfByMagazine books={books} mode={mode} />
       <Progress now={progress} processing={processing} />
     </>
   );
 }
 
-type BookCollection = Map<string, BookWithState>;
+type BookPlusNewArrival = Book & {newArrival: boolean};
 
 interface ControllerEvents {
-  onInitialize(books: BookCollection): void;
-  onStart(books: BookCollection): void;
-  onUpdate(books: BookCollection, progress: number): void;
-  onFinish(books: BookCollection): void;
+  onInitialize(books: BookPlusNewArrival[]): void;
+  onStart(books: BookPlusNewArrival[]): void;
+  onUpdate(books: BookPlusNewArrival[], progress: number): void;
+  onFinish(books: BookPlusNewArrival[]): void;
 }
 
 function createControllerBuilder(url: string) {
   const campaign = loadCampaign(url);
   const previous = new Set(campaign.books.map((book) => book.title));
-  const books = new Map<string, BookWithState>();
+  const books = new Map<string, BookPlusNewArrival>();
 
   let source = url;
   return (events: ControllerEvents) => {
     const {onInitialize, onStart, onUpdate, onFinish} = events;
 
-    onInitialize(new Map<string, BookWithState>(campaign.books.map((book: Book) => [book.title, Object.assign({}, book, {newArrival: false})])));
+    onInitialize(campaign.books.map((book: Book) => Object.assign({}, book, {newArrival: false})));
 
     let terminate = false;
     const start = async () => {
-      onStart(books);
+      onStart(Array.from(books.values()));
       terminate = false;
 
       try {
@@ -153,7 +158,7 @@ function createControllerBuilder(url: string) {
             }
           });
 
-          onUpdate(books, result.progress);
+          onUpdate(Array.from(books.values()), result.progress);
 
           await sleep(1000);
         }
@@ -172,7 +177,7 @@ function createControllerBuilder(url: string) {
           console.error(error);
         }
       } finally {
-        onFinish(books);
+        onFinish(Array.from(books.values()));
       }
     };
 

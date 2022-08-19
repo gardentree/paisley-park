@@ -14,6 +14,7 @@ interface Review {
   count: number;
 }
 interface BookWithState extends Book {
+  heat: string;
   newArrival: boolean;
 }
 interface Pagination {
@@ -26,6 +27,6 @@ type DisplayMode = "all" | "newArrival";
 interface Campaign {
   title: string;
   url: string;
-  books: BookWithState[];
+  books: Book[];
   updatedAt: number;
 }
