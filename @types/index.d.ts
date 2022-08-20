@@ -30,3 +30,8 @@ interface Campaign {
   books: Book[];
   updatedAt: number;
 }
+
+interface FilteringOption {
+  heatMaximum: number;
+  passingLine: number;
+}

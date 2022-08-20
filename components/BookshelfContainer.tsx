@@ -2,11 +2,14 @@ import type React from "react";
 import {useState, useEffect, useMemo, useRef} from "react";
 import {Button, Container, Form, Nav, Navbar, NavDropdown} from "react-bootstrap";
 import BookshelfByMagazine from "@/components/BookshelfByMagazine";
+import SubNavigation from "@/components/SubNavigation";
+import FilteringOptionForm from "@/components/FilteringOptionForm";
 import Progress from "./Progress";
 import buildBookReader, {FetchError} from "@/borders/books";
 import {useObjectWithLocalStorage} from "@/hooks/LocalStorage";
 import {sleep} from "@/libraries/utility";
 import {Heat} from "@/libraries/heat";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 interface Props {
   url: string;
@@ -16,8 +19,6 @@ const MODE: {[key in DisplayMode]: string} = {
   all: "全て",
   newArrival: "新着のみ",
 };
-
-const HEAT = new Heat(1024);
 
 export default function BookshelfContainer(props: Props) {
   const {url} = props;
@@ -32,8 +33,17 @@ export default function BookshelfContainer(props: Props) {
   const [progress, setProgress] = useState(0);
   const [processing, setProcessing] = useState(false);
   const [mode, setMode] = useState<DisplayMode>("all");
+  const [subNavigation, setSubNavigation] = useState(false);
+  const [option, setOption] = useState<FilteringOption>({
+    heatMaximum: 1024,
+    passingLine: 0,
+  });
 
-  const books = useMemo(() => allBooks.map((book) => Object.assign({}, book, {heat: HEAT.measure(book.review.count)})), [allBooks]);
+  const books = useMemo(() => {
+    const heat = new Heat(option.heatMaximum);
+
+    return allBooks.filter((book) => book.review.count >= option.passingLine).map((book) => Object.assign({}, book, {heat: heat.measure(book.review.count)}));
+  }, [allBooks, option]);
 
   const builder = useMemo(() => createControllerBuilder(url), [url]);
   const controller = useMemo(
@@ -101,6 +111,9 @@ export default function BookshelfContainer(props: Props) {
           <Nav className="justify-content-end">
             <Navbar.Text>Updated: {new Date(campaign.updatedAt).toLocaleString("ja-JP")}</Navbar.Text>
             <NavDropdown title={MODE[mode]}>{modeItems}</NavDropdown>
+            <Button variant="link" onClick={() => setSubNavigation(true)}>
+              <i className="bi-layout-sidebar-reverse" />
+            </Button>
             {processing ? (
               <Button onClick={() => controller.stop()} variant="outline-secondary">
                 Stop
@@ -116,6 +129,16 @@ export default function BookshelfContainer(props: Props) {
 
       <BookshelfByMagazine books={books} mode={mode} />
       <Progress now={progress} processing={processing} />
+
+      <SubNavigation show={subNavigation} setShow={setSubNavigation}>
+        <FilteringOptionForm
+          config={option}
+          setConfig={(config) => {
+            setOption(config);
+            setSubNavigation(false);
+          }}
+        />
+      </SubNavigation>
     </>
   );
 }
