@@ -20,4 +20,4 @@ Amazon Kindle のマンガセール情報まとめ
 
 ## Demo
 
-[See](https://paisleypark.herokuapp.com/)
+[See](https://paisley-park.vercel.app/)
