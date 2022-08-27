@@ -75,6 +75,99 @@ describe(BookshelfContainer, () => {
     expect(navigation.getByText("Update")).toBeInTheDocument();
     expect(navigation.getByText("新着のみ")).toBeInTheDocument();
   });
+  it("when update and update", async () => {
+    const book1 = fakeBook();
+    (() => {
+      async function* mock() {
+        yield {books: [book1], progress: 100};
+      }
+      (buildBookReader as jest.Mock).mockImplementation(mock);
+    })();
+
+    act(() => {
+      render(<BookshelfContainer url={faker.internet.url()} />);
+    });
+
+    await waitFor(() => expect(screen.getByAltText(book1.title)).toBeInTheDocument());
+
+    const main = within(screen.getByAltText(book1.title).closest("main")!);
+    expect(main.getByAltText(book1.title)).toBeInTheDocument();
+    expect(main.getByText(book1.magazine)).toBeInTheDocument();
+
+    const navigation = within(screen.getByRole("navigation"));
+    expect(navigation.getByText("Update")).toBeInTheDocument();
+    expect(navigation.getByText("新着のみ")).toBeInTheDocument();
+
+    const book2 = fakeBook();
+    (() => {
+      async function* mock() {
+        yield {books: [book2], progress: 100};
+      }
+      (buildBookReader as jest.Mock).mockImplementation(mock);
+    })();
+
+    act(() => {
+      const button = navigation.getByText("Update");
+      button.click();
+    });
+
+    await waitFor(() => expect(screen.getByAltText(book2.title)).toBeInTheDocument());
+
+    expect(main.getByAltText(book2.title)).toBeInTheDocument();
+    expect(main.getByText(book2.magazine)).toBeInTheDocument();
+
+    expect(main.queryByAltText(book1.title)).toBeNull();
+
+    expect(navigation.getByText("Update")).toBeInTheDocument();
+    expect(navigation.getByText("新着のみ")).toBeInTheDocument();
+  });
+  it("when update and resume", async () => {
+    const book1 = fakeBook();
+    (() => {
+      async function* mock() {
+        yield {books: [book1], progress: 50};
+        throw new FetchError(book1.anchor, 503);
+      }
+      (buildBookReader as jest.Mock).mockImplementation(mock);
+    })();
+
+    act(() => {
+      render(<BookshelfContainer url={faker.internet.url()} />);
+    });
+
+    await waitFor(() => expect(screen.getByAltText(book1.title)).toBeInTheDocument());
+
+    const main = within(screen.getByAltText(book1.title).closest("main")!);
+    expect(main.getByAltText(book1.title)).toBeInTheDocument();
+    expect(main.getByText(book1.magazine)).toBeInTheDocument();
+
+    const navigation = within(screen.getByRole("navigation"));
+    expect(navigation.getByText("Resume")).toBeInTheDocument();
+    expect(navigation.getByText("新着のみ")).toBeInTheDocument();
+
+    const book2 = fakeBook();
+    (() => {
+      async function* mock() {
+        yield {books: [book2], progress: 100};
+      }
+      (buildBookReader as jest.Mock).mockImplementation(mock);
+    })();
+
+    act(() => {
+      const button = navigation.getByText("Resume");
+      button.click();
+    });
+
+    await waitFor(() => expect(screen.getByAltText(book2.title)).toBeInTheDocument());
+
+    expect(main.getByAltText(book1.title)).toBeInTheDocument();
+    expect(main.getByText(book1.magazine)).toBeInTheDocument();
+    expect(main.getByAltText(book2.title)).toBeInTheDocument();
+    expect(main.getByText(book2.magazine)).toBeInTheDocument();
+
+    expect(navigation.getByText("Update")).toBeInTheDocument();
+    expect(navigation.getByText("新着のみ")).toBeInTheDocument();
+  });
   it("when raise server error", async () => {
     const book1 = fakeBook();
     const book2 = fakeBook();

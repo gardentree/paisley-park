@@ -100,6 +100,40 @@ export default function BookshelfContainer(props: Props) {
     title.blur();
   };
 
+  const controlButton = (() => {
+    let state;
+    if (processing) {
+      state = "stop";
+    } else {
+      if (controller.paused()) {
+        state = "resume";
+      } else {
+        state = "start";
+      }
+    }
+
+    switch (state) {
+      case "start":
+        return (
+          <Button onClick={() => controller.start()} variant="outline-success">
+            Update
+          </Button>
+        );
+      case "resume":
+        return (
+          <Button onClick={() => controller.resume()} variant="outline-success">
+            Resume
+          </Button>
+        );
+      case "stop":
+        return (
+          <Button onClick={() => controller.stop()} variant="outline-secondary">
+            Stop
+          </Button>
+        );
+    }
+  })();
+
   return (
     <>
       <Navbar expand="md" sticky="top" variant="dark" bg="dark">
@@ -114,15 +148,7 @@ export default function BookshelfContainer(props: Props) {
             <Button variant="link" onClick={() => setSubNavigation(true)}>
               <i className="bi-layout-sidebar-reverse" />
             </Button>
-            {processing ? (
-              <Button onClick={() => controller.stop()} variant="outline-secondary">
-                Stop
-              </Button>
-            ) : (
-              <Button onClick={() => controller.start()} variant="outline-success">
-                {controller.paused() ? "Resume" : "Update"}
-              </Button>
-            )}
+            {controlButton}
           </Nav>
         </Container>
       </Navbar>
@@ -164,7 +190,7 @@ function createControllerBuilder(url: string) {
     onInitialize(campaign.books.map((book: Book) => Object.assign({}, book, {newArrival: false})));
 
     let terminate = false;
-    const start = async () => {
+    const resume = async () => {
       onStart(Array.from(books.values()));
       terminate = false;
 
@@ -203,6 +229,12 @@ function createControllerBuilder(url: string) {
         onFinish(Array.from(books.values()));
       }
     };
+    const start = () => {
+      Array.from(books.values()).forEach((book) => {
+        book.newArrival = false;
+      });
+      resume();
+    };
 
     const stop = () => {
       terminate = true;
@@ -215,6 +247,7 @@ function createControllerBuilder(url: string) {
           start();
         }
       },
+      resume,
       stop,
       paused: () => url !== source,
     };
