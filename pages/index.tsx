@@ -40,10 +40,16 @@ const Home: NextPage = () => {
 
 export default Home;
 
-function loadCampaigns(): Record<string, string> {
+export function loadCampaigns(): Record<string, string> {
   const keys = Object.keys(localStorage).filter((key) => key.startsWith("http"));
+  const campaigns: Record<string, string> = {};
 
-  if (keys.length <= 0) {
+  if (keys.length > 0) {
+    for (const key of keys) {
+      const campaign = JSON.parse(localStorage.getItem(key)!);
+      campaigns[campaign.url] = campaign.title;
+    }
+  } else {
     const defaults = Object.entries({
       "https://www.amazon.co.jp/s?rh=n%3A8486051051&fs=true": "期間限定無料",
       "https://www.amazon.co.jp/s?rh=n%3A8138289051&fs=true": "無料",
@@ -59,13 +65,9 @@ function loadCampaigns(): Record<string, string> {
           updatedAt: Date.now(),
         })
       );
-    }
-  }
 
-  const campaigns: Record<string, string> = {};
-  for (const key of keys) {
-    const campaign = JSON.parse(localStorage.getItem(key)!);
-    campaigns[campaign.url] = campaign.title;
+      campaigns[url] = title;
+    }
   }
 
   return campaigns;
