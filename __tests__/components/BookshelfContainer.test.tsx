@@ -28,6 +28,10 @@ function fakeBook(): Book {
 }
 
 describe(BookshelfContainer, () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it("when single book", async () => {
     const book1 = fakeBook();
     async function* mock() {
@@ -252,21 +256,15 @@ describe(BookshelfContainer, () => {
     (buildBookReader as jest.Mock).mockImplementation(mock);
 
     const url = faker.internet.url();
-    jest.spyOn(window.localStorage.__proto__, "getItem").mockImplementation((key) => {
-      switch (key) {
-        case "exclusions":
-          return null;
-        case url:
-          return JSON.stringify({
-            url: key,
-            title: key,
-            books: [book0],
-            updatedAt: Date.now(),
-          });
-        default:
-          throw new Error();
-      }
-    });
+    localStorage.setItem(
+      url,
+      JSON.stringify({
+        url: url,
+        title: url,
+        books: [book0],
+        updatedAt: Date.now(),
+      })
+    );
 
     act(() => {
       render(<BookshelfContainer url={url} />);
@@ -294,21 +292,15 @@ describe(BookshelfContainer, () => {
     (buildBookReader as jest.Mock).mockImplementation(mock);
 
     const url = faker.internet.url();
-    jest.spyOn(window.localStorage.__proto__, "getItem").mockImplementation((key) => {
-      switch (key) {
-        case "exclusions":
-          return null;
-        case url:
-          return JSON.stringify({
-            url: key,
-            title: key,
-            books: [book0],
-            updatedAt: Date.now(),
-          });
-        default:
-          throw new Error();
-      }
-    });
+    localStorage.setItem(
+      url,
+      JSON.stringify({
+        url: url,
+        title: url,
+        books: [book0],
+        updatedAt: Date.now(),
+      })
+    );
 
     act(() => {
       render(<BookshelfContainer url={url} />);
