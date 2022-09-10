@@ -91,7 +91,11 @@ export default async function handler(request: NextApiRequest, response: NextApi
   const {url} = request.query as {url: string};
 
   try {
-    const amazon = await fetch(new URL(url, "https://www.amazon.co.jp"));
+    const amazon = await fetch(new URL(url, "https://www.amazon.co.jp"), {
+      headers: {
+        "user-agent": request.headers["user-agent"]!,
+      },
+    });
     if (!amazon.ok) {
       return response.status(amazon.status).json({
         message: amazon.url,

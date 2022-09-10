@@ -77,7 +77,7 @@ describe(handler, () => {
       },
     });
 
-    expect(fetchSpy).toHaveBeenCalledWith(new URL("https://www.amazon.co.jp/?page=2"));
+    expect(fetchSpy).toHaveBeenCalledWith(new URL("https://www.amazon.co.jp/?page=2"), {headers: {"user-agent": "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"}});
   });
 
   it("when 503", async () => {
@@ -96,7 +96,7 @@ describe(handler, () => {
       },
     });
 
-    expect(fetchSpy).toHaveBeenCalledWith(new URL("https://www.amazon.co.jp/?page=2"));
+    expect(fetchSpy).toHaveBeenCalledWith(new URL("https://www.amazon.co.jp/?page=2"), {headers: {"user-agent": "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"}});
   });
 
   it("when contents is empty", async () => {
@@ -115,7 +115,7 @@ describe(handler, () => {
       },
     });
 
-    expect(fetchSpy).toHaveBeenCalledWith(new URL("https://www.amazon.co.jp/?page=2"));
+    expect(fetchSpy).toHaveBeenCalledWith(new URL("https://www.amazon.co.jp/?page=2"), {headers: {"user-agent": "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"}});
   });
 
   afterEach(() => {
