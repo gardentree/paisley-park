@@ -2,6 +2,7 @@ import type {NextApiRequest, NextApiResponse} from "next";
 import jsdom from "jsdom";
 import fs from "fs";
 import pathname from "path";
+import {IncomingHttpHeaders} from "http";
 
 const TITLE_PATTRN = /^(?:第\s*\d+\s*[巻章]\s*\(全\s*\d+\s*[巻章]\):\s*(.+)|「(.+)」\s*全\d+[巻話]中の\d+[巻話])$/;
 const HEAD_PATTRN = /^.+\((.{3,})\)$/;
@@ -91,11 +92,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
   const {url} = request.query as {url: string};
 
   try {
-    const amazon = await fetch(new URL(url, "https://www.amazon.co.jp"), {
-      headers: {
-        "user-agent": request.headers["user-agent"]!,
-      },
-    });
+    const amazon = await fetch(new URL(url, "https://www.amazon.co.jp"), {headers: relayRequestHeaders(request.headers)});
     if (!amazon.ok) {
       return response.status(amazon.status).json({
         message: amazon.url,
@@ -137,4 +134,16 @@ export default async function handler(request: NextApiRequest, response: NextApi
       message,
     });
   }
+}
+function relayRequestHeaders(original: IncomingHttpHeaders): Record<string, string> {
+  const headers: Record<string, string> = {};
+
+  Object.keys(original)
+    .filter((key) => !["host", "set-cookie"].includes(key))
+    .forEach((key) => {
+      headers[key] = original[key] as string;
+    });
+  headers.host = "www.amazon.co.jp";
+
+  return headers;
 }

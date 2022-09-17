@@ -54,7 +54,7 @@ describe(handler, () => {
       url: "api/books",
       params: {url: "/?page=2"},
       test: async ({fetch}) => {
-        const response = await fetch();
+        const response = await fetch({headers: {"user-agent": "Mozilla"}});
         await expect(response.json()).resolves.toStrictEqual({
           books: [
             {
@@ -77,7 +77,12 @@ describe(handler, () => {
       },
     });
 
-    expect(fetchSpy).toHaveBeenCalledWith(new URL("https://www.amazon.co.jp/?page=2"), {headers: {"user-agent": "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"}});
+    expect(fetchSpy).toHaveBeenCalledWith(new URL("https://www.amazon.co.jp/?page=2"), {
+      headers: expect.objectContaining({
+        host: "www.amazon.co.jp",
+        "user-agent": "Mozilla",
+      }),
+    });
   });
 
   it("when 503", async () => {
@@ -91,12 +96,17 @@ describe(handler, () => {
       url: "api/books",
       params: {url: "/?page=2"},
       test: async ({fetch}) => {
-        const response = await fetch();
+        const response = await fetch({headers: {"user-agent": "Mozilla"}});
         expect(response.status).toBe(503);
       },
     });
 
-    expect(fetchSpy).toHaveBeenCalledWith(new URL("https://www.amazon.co.jp/?page=2"), {headers: {"user-agent": "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"}});
+    expect(fetchSpy).toHaveBeenCalledWith(new URL("https://www.amazon.co.jp/?page=2"), {
+      headers: expect.objectContaining({
+        host: "www.amazon.co.jp",
+        "user-agent": "Mozilla",
+      }),
+    });
   });
 
   it("when contents is empty", async () => {
@@ -110,12 +120,17 @@ describe(handler, () => {
       url: "api/books",
       params: {url: "/?page=2"},
       test: async ({fetch}) => {
-        const response = await fetch();
+        const response = await fetch({headers: {"user-agent": "Mozilla"}});
         expect(response.status).toBe(503);
       },
     });
 
-    expect(fetchSpy).toHaveBeenCalledWith(new URL("https://www.amazon.co.jp/?page=2"), {headers: {"user-agent": "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"}});
+    expect(fetchSpy).toHaveBeenCalledWith(new URL("https://www.amazon.co.jp/?page=2"), {
+      headers: expect.objectContaining({
+        host: "www.amazon.co.jp",
+        "user-agent": "Mozilla",
+      }),
+    });
   });
 
   afterEach(() => {
