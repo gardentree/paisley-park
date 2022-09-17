@@ -3,7 +3,7 @@ import jsdom from "jsdom";
 import fs from "fs";
 import pathname from "path";
 
-const TITLE_PATTRN = /「(.+)」\s*全\d+[巻話]中の\d+[巻話]/;
+const TITLE_PATTRN = /^(?:第\s*\d+\s*[巻章]\s*\(全\s*\d+\s*[巻章]\):\s*(.+)|「(.+)」\s*全\d+[巻話]中の\d+[巻話])$/;
 const HEAD_PATTRN = /^.+\((.{3,})\)$/;
 const REVIEW_PATTEN = /5つ星のうち(\d\.\d)\s+([\d,]+)/;
 
@@ -45,7 +45,7 @@ export function extractTitle(section: Element) {
   const matcher = TITLE_PATTRN.exec(content);
 
   if (matcher) {
-    return matcher[1];
+    return matcher[1] || matcher[2];
   } else {
     return content;
   }
