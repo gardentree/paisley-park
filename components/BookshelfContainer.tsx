@@ -45,39 +45,41 @@ export default function BookshelfContainer(props: Props) {
     return allBooks.filter((book) => book.review.count >= option.passingLine).map((book) => Object.assign({}, book, {heat: heat.measure(book.review.count)}));
   }, [allBooks, option]);
 
-  const builder = useMemo(() => createControllerBuilder(url), [url]);
-  const controller = useMemo(
-    () =>
-      builder({
-        onInitialize: (books) => {
-          setAllBooks(books);
-        },
-        onStart: (books) => {
-          setProcessing(true);
-          setMode("newArrival");
-          setAllBooks(books);
-        },
-        onUpdate: (books, progress) => {
-          setAllBooks(books);
-          setProgress(progress);
-        },
-        onFinish: (books) => {
-          setCampaignRef.current((previous) => ({
-            ...previous,
-            books: books,
-            updatedAt: Date.now(),
-          }));
-          setProcessing(false);
-        },
-      }),
-    [builder]
-  );
-
+  const [controller, setController] = useState<Controller | null>(null);
   useEffect(() => {
+    const builder = createControllerBuilder(url);
+    const controller = builder({
+      onInitialize: (books) => {
+        setAllBooks(books);
+      },
+      onStart: (books) => {
+        setProcessing(true);
+        setMode("newArrival");
+        setAllBooks(books);
+      },
+      onUpdate: (books, progress) => {
+        setAllBooks(books);
+        setProgress(progress);
+      },
+      onFinish: (books) => {
+        setCampaignRef.current((previous) => ({
+          ...previous,
+          books: books,
+          updatedAt: Date.now(),
+        }));
+        setProcessing(false);
+      },
+    });
+    setController(controller);
+
     controller.startIfEmpty();
 
     return controller.stop;
-  }, [controller]);
+  }, [url]);
+
+  if (!controller) {
+    return null;
+  }
 
   const changeMode = (mode: DisplayMode) => {
     setMode(mode);
@@ -176,6 +178,12 @@ interface ControllerEvents {
   onStart(books: BookPlusNewArrival[]): void;
   onUpdate(books: BookPlusNewArrival[], progress: number): void;
   onFinish(books: BookPlusNewArrival[]): void;
+}
+interface Controller {
+  start(): void;
+  resume(): void;
+  paused(): boolean;
+  stop(): void;
 }
 
 function createControllerBuilder(url: string) {
