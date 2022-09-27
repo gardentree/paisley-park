@@ -1,13 +1,13 @@
 import {fetchWithRetry} from "@/libraries/utility";
 
-export default async function* buildBookReader(url: string) {
+export default async function* buildBookReader(url: string, signal: AbortSignal) {
   let target: string | null = url;
 
   for (let i = 0; target && i < 1000; i++) {
-    const response = await fetchWithRetry(`/api/books/${encodeURIComponent(target)}`, 3);
+    const response = await fetchWithRetry(`/api/books/${encodeURIComponent(target)}`, 3, signal);
 
     if (!response.ok) {
-      throw new FetchError(target, response.status);
+      throw new Error(`${response.status}: ${target}`);
     }
 
     const payload: Payload = await response.json();
@@ -16,18 +16,7 @@ export default async function* buildBookReader(url: string) {
     yield {
       books: payload.books,
       progress: Math.ceil((payload.pagination.numerator * 100) / payload.pagination.denominator),
+      next: target,
     };
-  }
-}
-
-export class FetchError extends Error {
-  url: string;
-  status: number;
-
-  constructor(url: string, status: number) {
-    super(JSON.stringify({url, status}));
-
-    this.url = url;
-    this.status = status;
   }
 }

@@ -5,9 +5,10 @@ import BookshelfByMagazine from "@/components/BookshelfByMagazine";
 import SubNavigation from "@/components/SubNavigation";
 import FilteringOptionForm from "@/components/FilteringOptionForm";
 import Progress from "./Progress";
-import buildBookReader, {FetchError} from "@/borders/books";
+import buildBookReader from "@/borders/books";
 import {useObjectWithLocalStorage} from "@/hooks/LocalStorage";
 import {sleep} from "@/libraries/utility";
+import {AbortException} from "@/libraries/abort";
 import {Heat} from "@/libraries/heat";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
@@ -31,7 +32,7 @@ export default function BookshelfContainer(props: Props) {
   const setCampaignRef = useRef(setCampaign);
   const [allBooks, setAllBooks] = useState<BookPlusNewArrival[]>([]);
   const [progress, setProgress] = useState(0);
-  const [processing, setProcessing] = useState(false);
+  const [failure, setFailure] = useState<string | null>(null);
   const [mode, setMode] = useState<DisplayMode>("all");
   const [subNavigation, setSubNavigation] = useState(false);
   const [option, setOption] = useState<FilteringOption>({
@@ -53,7 +54,7 @@ export default function BookshelfContainer(props: Props) {
         setAllBooks(books);
       },
       onStart: (books) => {
-        setProcessing(true);
+        setFailure(null);
         setMode("newArrival");
         setAllBooks(books);
       },
@@ -61,13 +62,13 @@ export default function BookshelfContainer(props: Props) {
         setAllBooks(books);
         setProgress(progress);
       },
-      onFinish: (books) => {
+      onFinish: (books, failure) => {
         setCampaignRef.current((previous) => ({
           ...previous,
           books: books,
           updatedAt: Date.now(),
         }));
-        setProcessing(false);
+        setFailure(failure);
       },
     });
     setController(controller);
@@ -104,13 +105,13 @@ export default function BookshelfContainer(props: Props) {
 
   const controlButton = (() => {
     let state;
-    if (processing) {
-      state = "stop";
+    if (failure) {
+      state = "resume";
     } else {
-      if (controller.paused()) {
-        state = "resume";
-      } else {
+      if ([0, 100].includes(progress)) {
         state = "start";
+      } else {
+        state = "stop";
       }
     }
 
@@ -156,7 +157,7 @@ export default function BookshelfContainer(props: Props) {
       </Navbar>
 
       <BookshelfByMagazine books={books} mode={mode} />
-      <Progress now={progress} processing={processing} />
+      <Progress now={progress} failure={failure} />
 
       <SubNavigation show={subNavigation} setShow={setSubNavigation}>
         <FilteringOptionForm
@@ -177,12 +178,11 @@ interface ControllerEvents {
   onInitialize(books: BookPlusNewArrival[]): void;
   onStart(books: BookPlusNewArrival[]): void;
   onUpdate(books: BookPlusNewArrival[], progress: number): void;
-  onFinish(books: BookPlusNewArrival[]): void;
+  onFinish(books: BookPlusNewArrival[], failure: string | null): void;
 }
 interface Controller {
   start(): void;
   resume(): void;
-  paused(): boolean;
   stop(): void;
 }
 
@@ -191,24 +191,20 @@ function createControllerBuilder(url: string) {
   const previous = new Set(campaign.books.map((book) => book.title));
   const books = new Map<string, BookPlusNewArrival>();
 
-  let source = url;
+  let source: string | null = url;
   return (events: ControllerEvents) => {
     const {onInitialize, onStart, onUpdate, onFinish} = events;
 
     onInitialize(campaign.books.map((book: Book) => Object.assign({}, book, {newArrival: false})));
 
-    let terminate = false;
+    const abort = new AbortController();
     const resume = async () => {
+      let failure: string | null = null;
       onStart(Array.from(books.values()));
-      terminate = false;
 
       try {
-        const reader = buildBookReader(source);
+        const reader = buildBookReader(source!, abort.signal);
         for await (const result of reader) {
-          if (terminate) {
-            return;
-          }
-
           result.books.forEach((book) => {
             if (!books.has(book.title)) {
               books.set(book.title, Object.assign({}, book, {newArrival: !previous.has(book.title)}));
@@ -217,24 +213,25 @@ function createControllerBuilder(url: string) {
 
           onUpdate(Array.from(books.values()), result.progress);
 
-          await sleep(1000);
+          source = result.next;
+          await sleep(1000, abort.signal);
         }
-        source = url;
       } catch (error: unknown) {
         if (error instanceof Error) {
           switch (error.constructor) {
-            case FetchError:
-              source = (error as FetchError).url;
+            case AbortException:
               break;
             default:
               console.error(error.message);
+              failure = error.message;
               break;
           }
         } else {
           console.error(error);
+          failure = JSON.stringify(error);
         }
       } finally {
-        onFinish(Array.from(books.values()));
+        onFinish(Array.from(books.values()), failure);
       }
     };
     const start = () => {
@@ -245,7 +242,7 @@ function createControllerBuilder(url: string) {
     };
 
     const stop = () => {
-      terminate = true;
+      abort.abort();
     };
 
     return {
@@ -257,7 +254,6 @@ function createControllerBuilder(url: string) {
       },
       resume,
       stop,
-      paused: () => url !== source,
     };
   };
 }

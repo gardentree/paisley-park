@@ -1,9 +1,9 @@
-import buildBookReader, {FetchError} from "@/borders/books";
+import buildBookReader from "@/borders/books";
 import {faker} from "@faker-js/faker";
 
 interface Plan {
   payload: Payload;
-  expected: {books: Book[]; progress: number};
+  expected: {books: Book[]; progress: number; next: string | null};
 }
 
 function fakeBook(): Book {
@@ -12,6 +12,7 @@ function fakeBook(): Book {
     magazine: faker.music.genre(),
     anchor: faker.internet.url(),
     image: faker.internet.avatar(),
+    review: {star: 0, count: 0},
   };
 }
 describe(buildBookReader, () => {
@@ -44,12 +45,12 @@ describe(buildBookReader, () => {
         payload: {
           books: [book1],
           pagination: {
-            next: faker.internet.url(),
+            next: "https://test.com/1",
             numerator: 1,
             denominator: 2,
           },
         },
-        expected: {books: [book1], progress: 50},
+        expected: {books: [book1], progress: 50, next: "https://test.com/1"},
       },
       {
         payload: {
@@ -60,12 +61,14 @@ describe(buildBookReader, () => {
             denominator: 2,
           },
         },
-        expected: {books: [book2], progress: 100},
+        expected: {books: [book2], progress: 100, next: null},
       },
     ];
     planFetchSpy(plans);
 
-    const reader = buildBookReader(faker.internet.url());
+    const signal = new AbortController().signal;
+
+    const reader = buildBookReader(faker.internet.url(), signal);
     await expect(reader.next()).resolves.toStrictEqual({value: plans[0].expected, done: false});
     await expect(reader.next()).resolves.toStrictEqual({value: plans[1].expected, done: false});
     await expect(reader.next()).resolves.toStrictEqual({value: undefined, done: true});
@@ -74,9 +77,11 @@ describe(buildBookReader, () => {
   it("when raise 504 in fetch", async () => {
     fetchSpy.mockReturnValueOnce(Promise.resolve(new Response("504", {status: 504})));
 
+    const signal = new AbortController().signal;
+
     const url = faker.internet.url();
-    const reader = buildBookReader(url);
-    await expect(reader.next()).rejects.toThrowError(new FetchError(url, 504));
+    const reader = buildBookReader(url, signal);
+    await expect(reader.next()).rejects.toThrowError(new Error(`504: ${url}`));
   });
 
   it("when raise 504 in second fetch", async () => {
@@ -94,15 +99,17 @@ describe(buildBookReader, () => {
             denominator: 2,
           },
         },
-        expected: {books: [book1], progress: 50},
+        expected: {books: [book1], progress: 50, next: second},
       },
     ];
     planFetchSpy(plans);
     fetchSpy.mockReturnValueOnce(Promise.resolve(new Response("504", {status: 504})));
 
-    const reader = buildBookReader(first);
+    const signal = new AbortController().signal;
+
+    const reader = buildBookReader(first, signal);
     await expect(reader.next()).resolves.toStrictEqual({value: plans[0].expected, done: false});
-    await expect(reader.next()).rejects.toThrowError(new FetchError(second, 504));
+    await expect(reader.next()).rejects.toThrowError(new Error(`504: ${second}`));
   });
 
   afterEach(() => {
