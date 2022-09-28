@@ -48,8 +48,7 @@ export default function BookshelfContainer(props: Props) {
 
   const [controller, setController] = useState<Controller | null>(null);
   useEffect(() => {
-    const builder = createControllerBuilder(url);
-    const controller = builder({
+    const controller = buildController(url, {
       onInitialize: (books) => {
         setAllBooks(books);
       },
@@ -186,75 +185,74 @@ interface Controller {
   stop(): void;
 }
 
-function createControllerBuilder(url: string) {
+function buildController(url: string, events: ControllerEvents) {
   const campaign = loadCampaign(url);
   const previous = new Set(campaign.books.map((book) => book.title));
   const books = new Map<string, BookPlusNewArrival>();
 
   let source: string | null = url;
-  return (events: ControllerEvents) => {
-    const {onInitialize, onStart, onUpdate, onFinish} = events;
 
-    onInitialize(campaign.books.map((book: Book) => Object.assign({}, book, {newArrival: false})));
+  const {onInitialize, onStart, onUpdate, onFinish} = events;
 
-    const abort = new AbortController();
-    const resume = async () => {
-      let failure: string | null = null;
-      onStart(Array.from(books.values()));
+  onInitialize(campaign.books.map((book: Book) => Object.assign({}, book, {newArrival: false})));
 
-      try {
-        const reader = buildBookReader(source!, abort.signal);
-        for await (const result of reader) {
-          result.books.forEach((book) => {
-            if (!books.has(book.title)) {
-              books.set(book.title, Object.assign({}, book, {newArrival: !previous.has(book.title)}));
-            }
-          });
+  const abort = new AbortController();
+  const resume = async () => {
+    let failure: string | null = null;
+    onStart(Array.from(books.values()));
 
-          onUpdate(Array.from(books.values()), result.progress);
-
-          source = result.next;
-          await sleep(1000, abort.signal);
-        }
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          switch (error.constructor) {
-            case AbortException:
-              break;
-            default:
-              console.error(error.message);
-              failure = error.message;
-              break;
+    try {
+      const reader = buildBookReader(source!, abort.signal);
+      for await (const result of reader) {
+        result.books.forEach((book) => {
+          if (!books.has(book.title)) {
+            books.set(book.title, Object.assign({}, book, {newArrival: !previous.has(book.title)}));
           }
-        } else {
-          console.error(error);
-          failure = JSON.stringify(error);
-        }
-      } finally {
-        onFinish(Array.from(books.values()), failure);
+        });
+
+        onUpdate(Array.from(books.values()), result.progress);
+
+        source = result.next;
+        await sleep(1000, abort.signal);
       }
-    };
-    const start = () => {
-      Array.from(books.values()).forEach((book) => {
-        book.newArrival = false;
-      });
-      resume();
-    };
-
-    const stop = () => {
-      abort.abort();
-    };
-
-    return {
-      start,
-      startIfEmpty: () => {
-        if (previous.size <= 0) {
-          start();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        switch (error.constructor) {
+          case AbortException:
+            break;
+          default:
+            console.error(error.message);
+            failure = error.message;
+            break;
         }
-      },
-      resume,
-      stop,
-    };
+      } else {
+        console.error(error);
+        failure = JSON.stringify(error);
+      }
+    } finally {
+      onFinish(Array.from(books.values()), failure);
+    }
+  };
+  const start = () => {
+    Array.from(books.values()).forEach((book) => {
+      book.newArrival = false;
+    });
+    resume();
+  };
+
+  const stop = () => {
+    abort.abort();
+  };
+
+  return {
+    start,
+    startIfEmpty: () => {
+      if (previous.size <= 0) {
+        start();
+      }
+    },
+    resume,
+    stop,
   };
 }
 
