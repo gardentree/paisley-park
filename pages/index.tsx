@@ -31,7 +31,19 @@ const Home: NextPage = () => {
     <div className={styles.container}>
       <Form onSubmit={handleSubmit}>
         <WithList items={campaigns} onClick={handleClick}>
-          <FormControl name="url" type="url" placeholder="Enter url" defaultValue="" />
+          <FormControl
+            name="url"
+            type="url"
+            placeholder="Enter url"
+            defaultValue=""
+            onKeyDown={(event) => {
+              if (event.code == "Enter") {
+                event.preventDefault();
+
+                goBookshelves(event.currentTarget.value);
+              }
+            }}
+          />
         </WithList>
       </Form>
     </div>
