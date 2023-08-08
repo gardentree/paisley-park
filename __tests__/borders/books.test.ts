@@ -1,14 +1,16 @@
 import buildBookReader from "@/borders/books";
 import {faker} from "@faker-js/faker";
+import {UniqueEnforcer} from "enforce-unique";
 
 interface Plan {
   payload: Payload;
   expected: {books: Book[]; progress: number; next: string | null};
 }
 
+const unique = new UniqueEnforcer();
 function fakeBook(): Book {
   return {
-    title: faker.unique(faker.music.songName),
+    title: unique.enforce(faker.music.songName),
     magazine: faker.music.genre(),
     anchor: faker.internet.url(),
     image: faker.internet.avatar(),

@@ -1,6 +1,7 @@
 import {render, screen, waitFor, within} from "@testing-library/react";
 import {act} from "react-dom/test-utils";
 import {faker} from "@faker-js/faker";
+import {UniqueEnforcer} from "enforce-unique";
 import BookshelfContainer from "@/components/BookshelfContainer";
 import buildBookReader from "@/borders/books";
 
@@ -14,15 +15,16 @@ jest.mock("@/borders/books", () => {
   };
 });
 
+const unique = new UniqueEnforcer();
 function fakeBook(): Book {
   return {
-    title: faker.unique(faker.music.songName),
+    title: unique.enforce(faker.music.songName),
     magazine: faker.music.genre(),
     anchor: faker.internet.url(),
     image: faker.internet.avatar(),
     review: {
-      star: faker.datatype.number({min: 0, max: 5}),
-      count: faker.datatype.number({min: 0, max: 10000}),
+      star: faker.number.int({min: 0, max: 5}),
+      count: faker.number.int({min: 0, max: 10000}),
     },
   };
 }

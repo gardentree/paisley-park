@@ -16,7 +16,7 @@ describe(loadCampaigns, () => {
   });
   it("when stored in local storage", () => {
     const campaign = {
-      title: faker.company.companyName(),
+      title: faker.company.buzzPhrase(),
       url: faker.internet.url(),
       books: [],
       updatedAt: Date.now(),
