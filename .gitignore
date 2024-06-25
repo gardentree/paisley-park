@@ -36,3 +36,9 @@ yarn-error.log*
 
 # temporary
 /tmp
+
+# yarn
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+.pnp.*
