@@ -2356,10 +2356,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cookie@npm:^0.6.0":
-  version: 0.6.0
-  resolution: "cookie@npm:0.6.0"
-  checksum: 10c0/f2318b31af7a31b4ddb4a678d024514df5e705f9be5909a192d7f116cfb6d45cbacf96a473fa733faa95050e7cff26e7832bb3ef94751592f1387b71c8956686
+"cookie@npm:>=0.7.0":
+  version: 1.0.1
+  resolution: "cookie@npm:1.0.1"
+  checksum: 10c0/80afdcad7fe9cab7a0ea1802629f6f4cf9ff957e9489daa7a813e3ac4ca842b0e5ab3f8e6a6ddc1f3f5c771b81c229afd6f0f3c083025d68c48d214ea8fb1097
   languageName: node
   linkType: hard
 
