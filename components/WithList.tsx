@@ -13,7 +13,8 @@ export default function WithList(props: Props) {
   const {children, items, onClick} = props;
   const [focus, setFocus] = useState(false);
 
-  const child = cloneElement(children, {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const child = cloneElement(children as React.ReactElement<any>, {
     onFocus: () => {
       setFocus(true);
     },
