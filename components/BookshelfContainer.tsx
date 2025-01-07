@@ -16,7 +16,7 @@ interface Props {
   url: string;
 }
 
-const MODE: {[key in DisplayMode]: string} = {
+const MODE: Record<DisplayMode, string> = {
   all: "全て",
   newArrival: "新着のみ",
 };
