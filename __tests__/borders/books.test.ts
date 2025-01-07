@@ -13,7 +13,7 @@ function fakeBook(): Book {
     title: unique.enforce(faker.music.songName),
     magazine: faker.music.genre(),
     anchor: faker.internet.url(),
-    image: faker.internet.avatar(),
+    image: faker.image.avatar(),
     review: {star: 0, count: 0},
   };
 }

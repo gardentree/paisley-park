@@ -21,7 +21,7 @@ function fakeBook(): Book {
     title: unique.enforce(faker.music.songName),
     magazine: faker.music.genre(),
     anchor: faker.internet.url(),
-    image: faker.internet.avatar(),
+    image: faker.image.avatar(),
     review: {
       star: faker.number.int({min: 0, max: 5}),
       count: faker.number.int({min: 0, max: 10000}),
